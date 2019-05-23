@@ -10,7 +10,27 @@
 
 
 @interface Tweet : NSObject {
-
+	id delegate;
+	NSMutableDictionary *raw;
+	NSImage	*mUserIcon;
+	NSImage	*mUserIconTrimmed;
+	NSString *mDisplayDate;
+	NSString *mFullDate;
+	
+	NSString *mTweet;
+	NSString *mFullTweet;
+	
+	NSImage *mImages[4];
 }
 
++ (Tweet*)initWithTweetDictionary:(NSDictionary*) dict;
++ (Tweet*)initWithTweetDictionary:(NSDictionary*) dict withDelegate:(id)del;
+- (void)setTweet:(NSDictionary*) dict;
+- (void)setDelegate:(id) del;
+- (NSString*) user;
+- (NSString*) fullTweet;
+- (NSString*) tweet;
+- (NSString*) date;
+- (NSImage*) icon;
+- (NSImage*) iconRaw;
 @end

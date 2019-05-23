@@ -8,6 +8,7 @@
 
 #import "TwReader_AppDelegate.h"
 #import "NSImage+MGCropExtensions.h"
+#import "Tweet.h"
 
 @implementation TwReader_AppDelegate
 
@@ -16,9 +17,20 @@
 @synthesize tweetsArray;
 @synthesize timelineTableView;
 @synthesize tweetDetailTweetTextVIew;
+@synthesize tweetDetailDrawer;
+@synthesize tweetDetailDrawerView;
+@synthesize tweetDetailImage1;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+	[tweetDetailDrawer openOnEdge:NSMaxXEdge];
+	[timelineTableView setSortDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"fullDate" ascending:NO]]];
+	[tweetDetailTweetTextVIew setVerticallyResizable:YES];
+	tweetDetailTweetTextVIew.backgroundColor = [NSColor controlBackgroundColor];
+	tweetDetailTweetTextVIew.drawsBackground = NO;
 	
+	NSMethodSignature *sig = [timelineTableView methodSignatureForSelector:@selector(_changeSortDescriptorsForClickOnColumn:)];
+	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:sig];
+
     // there is no saved Google authentication
     //
     // perhaps we have a saved authorization for Twitter instead; try getting
@@ -135,10 +147,7 @@ static NSString *const kTwitterAppServiceName = @"TwReader OAuth";
 	NSURL *url = [NSURL URLWithString:urlStr];
 	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
 	[mAuth authorizeRequest:request];
-	
-	// Synchronous fetches like this are a really bad idea in Cocoa applications
-	//
-	// For a very easy async alternative, we could use GDataHTTPFetcher
+
 	NSError *error = nil;
 	NSURLResponse *response = nil;
 	NSData *data = [NSURLConnection sendSynchronousRequest:request
@@ -148,46 +157,16 @@ static NSString *const kTwitterAppServiceName = @"TwReader OAuth";
 	if (data) {
 		NSError *err;
 		NSArray *tweets = [NSJSONSerialization JSONObjectWithData:data options:0 error:&err];
-		
-		NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-		dateFormatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
-		dateFormatter.dateFormat = @"EEE MMM dd HH:mm:ss Z yyyy";
-		dateFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
-		NSDateFormatter *dateFormatterParsed = [[NSDateFormatter alloc] init];
-		dateFormatterParsed.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
-		dateFormatterParsed.dateFormat = @"HH:mm:ss";
 
 		[tweets enumerateObjectsUsingBlock:^(NSDictionary *tweet, NSUInteger idx, BOOL *stop) {
 			if(idx==0)
 				sinceID = tweet[@"id"];
 				
-			NSString *tweetText, *userText;
-			if (tweet[@"retweeted_status"]) { 
-				tweetText = tweet[@"retweeted_status"][@"full_text"];
-				userText = tweet[@"retweeted_status"][@"user"][@"screen_name"];
-			} else {
-				tweetText = tweet[@"full_text"];
-				userText = tweet[@"user"][@"screen_name"];
-			}
-			
-			NSMutableDictionary *curTweet= [@{
-				@"user":userText,
-				@"date":[dateFormatterParsed stringFromDate:[dateFormatter dateFromString:tweet[@"created_at"]]],
-				@"tweet":tweetText,
-				@"raw":tweet
-			} mutableCopy];
-
-			[tweetsArray addObject:curTweet];
-
+			[tweetsArray addObject:[Tweet initWithTweetDictionary:tweet withDelegate:self]];
 			dispatch_async(dispatch_get_main_queue(), ^{
 				[tweetsArrayController rearrangeObjects];
 				[timelineTableView reloadData];
 			});
-
-			dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
-				[self loadIconForTweet:curTweet withURL:tweet[@"user"][@"profile_image_url_https"]];
-			});
-
 		}];
 
 	} else {
@@ -196,20 +175,6 @@ static NSString *const kTwitterAppServiceName = @"TwReader OAuth";
 	}
 }
 
-- (void) loadIconForTweet:(NSMutableDictionary*)tweet withURL:(NSString*)url {
-	NSError *error = nil;
-	NSURLResponse *response = nil;
-	NSData *data = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:10]
-										 returningResponse:&response
-													 error:&error];
-
-	NSImage *iconRaw = [[NSImage alloc] initWithData:data];
-	dispatch_async(dispatch_get_main_queue(), ^{
-		tweet[@"icon"] = [iconRaw imageToFitSize:NSMakeSize(48, 16.0) method:MGImageResizeCrop],
-		tweet[@"iconRaw"] =iconRaw,
-		[timelineTableView reloadData];
-	});
-}
 
 - (NSAttributedString *)autoLinkURLs:(NSString *)string {
     NSMutableAttributedString *linkedString = [[NSMutableAttributedString alloc] initWithString:string];
@@ -234,11 +199,30 @@ static NSString *const kTwitterAppServiceName = @"TwReader OAuth";
 }
 
 - (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row {
-	NSDictionary *selection = [[tweetsArrayController arrangedObjects] objectAtIndex:row];
-	if(selection)
-		[tweetDetailTweetTextVIew.textStorage setAttributedString:[self autoLinkURLs:selection[@"tweet"]]];
-
+	Tweet *selection = [[tweetsArrayController arrangedObjects] objectAtIndex:row];
+	if(selection) {
+		[tweetDetailTweetTextVIew.textStorage setAttributedString:[self autoLinkURLs:[selection fullTweet]]];
+		[tweetDetailDrawerView setNeedsDisplay:YES];
+	}
 	return YES;
+}
+
+-(void) finishedLoadIconAsync {
+
+	dispatch_async(dispatch_get_main_queue(), ^{
+
+		[timelineTableView reloadData];
+	});
+}
+
+-(void) finishedLoadImageAsync {
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[tweetsArrayController rearrangeObjects];
+//		[[tweetDetailImage1 image] recache];
+//		[tweetDetailImage1 drawCell:[tweetDetailImage1 cell]];
+//		[tweetDetailDrawerView setLayerContentsRedrawPolicy:NSViewLayerContentsRedrawOnSetNeedsDisplay];
+//		[tweetDetailDrawerView setNeedsDisplay:YES];
+	});
 }
 
 @end
