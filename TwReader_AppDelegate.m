@@ -7,11 +7,15 @@
 //
 
 #import "TwReader_AppDelegate.h"
+#import "NSImage+MGCropExtensions.h"
 
 @implementation TwReader_AppDelegate
 
 @synthesize window;
-
+@synthesize tweetsArrayController;
+@synthesize tweetsArray;
+@synthesize timelineTableView;
+@synthesize tweetDetailTweetTextVIew;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
 	
@@ -30,7 +34,12 @@
 			mAuth = auth;
 		}
     }
-	[self doAnAuthenticatedAPIFetch];
+	
+	if(mAuth) {
+		[self refreshTimeline];
+		NSTimer *timer = [NSTimer timerWithTimeInterval:5 target:self selector:@selector(refreshTimeline) userInfo:nil repeats:YES];
+		[[NSRunLoop mainRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
+	}
 }
 
 static NSString *const kTwitterServiceName = @"Twitter";
@@ -109,10 +118,20 @@ static NSString *const kTwitterAppServiceName = @"TwReader OAuth";
 
 #pragma mark -
 
+- (void)refreshTimeline{
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+		[self doAnAuthenticatedAPIFetch];
+	});
+}
+
 - (void)doAnAuthenticatedAPIFetch {
 	NSString *urlStr;
-	urlStr = @"https://api.twitter.com/1.1/statuses/home_timeline.json?count=10&exclude_replies=false&include_entities=true&tweet_mode=extended";
+	if(sinceID)
+		urlStr = [NSString stringWithFormat:@"https://api.twitter.com/1.1/lists/statuses.json?slug=tl-20180817180736&owner_screen_name=b5x&count=500&include_entities=true&include_rts=true&tweet_mode=extended&since_id=%@",sinceID];//@"https://api.twitter.com/1.1/statuses/home_timeline.json?count=100&exclude_replies=false&include_entities=true&tweet_mode=extended";
+	else
+		urlStr = @"https://api.twitter.com/1.1/lists/statuses.json?slug=tl-20180817180736&owner_screen_name=b5x&count=500&include_entities=true&include_rts=true&tweet_mode=extended";
 	
+	NSLog(urlStr);
 	NSURL *url = [NSURL URLWithString:urlStr];
 	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
 	[mAuth authorizeRequest:request];
@@ -127,16 +146,99 @@ static NSString *const kTwitterAppServiceName = @"TwReader OAuth";
 													 error:&error];
 	
 	if (data) {
-		// API fetch succeeded
-//		NSString *str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-		//NSLog(@"API response: %@", str);
 		NSError *err;
-		NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:0 error:&err];
-		NSLog(@"%@",dict);
+		NSArray *tweets = [NSJSONSerialization JSONObjectWithData:data options:0 error:&err];
+		
+		NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+		dateFormatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+		dateFormatter.dateFormat = @"EEE MMM dd HH:mm:ss Z yyyy";
+		dateFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+		NSDateFormatter *dateFormatterParsed = [[NSDateFormatter alloc] init];
+		dateFormatterParsed.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+		dateFormatterParsed.dateFormat = @"HH:mm:ss";
+
+		[tweets enumerateObjectsUsingBlock:^(NSDictionary *tweet, NSUInteger idx, BOOL *stop) {
+			if(idx==0)
+				sinceID = tweet[@"id"];
+				
+			NSString *tweetText, *userText;
+			if (tweet[@"retweeted_status"]) { 
+				tweetText = tweet[@"retweeted_status"][@"full_text"];
+				userText = tweet[@"retweeted_status"][@"user"][@"screen_name"];
+			} else {
+				tweetText = tweet[@"full_text"];
+				userText = tweet[@"user"][@"screen_name"];
+			}
+			
+			NSMutableDictionary *curTweet= [@{
+				@"user":userText,
+				@"date":[dateFormatterParsed stringFromDate:[dateFormatter dateFromString:tweet[@"created_at"]]],
+				@"tweet":tweetText,
+				@"raw":tweet
+			} mutableCopy];
+
+			[tweetsArray addObject:curTweet];
+
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[tweetsArrayController rearrangeObjects];
+				[timelineTableView reloadData];
+			});
+
+			dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
+				[self loadIconForTweet:curTweet withURL:tweet[@"user"][@"profile_image_url_https"]];
+			});
+
+		}];
+
 	} else {
 		// fetch failed
 		NSLog(@"API fetch error: %@", error);
 	}
+}
+
+- (void) loadIconForTweet:(NSMutableDictionary*)tweet withURL:(NSString*)url {
+	NSError *error = nil;
+	NSURLResponse *response = nil;
+	NSData *data = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:10]
+										 returningResponse:&response
+													 error:&error];
+
+	NSImage *iconRaw = [[NSImage alloc] initWithData:data];
+	dispatch_async(dispatch_get_main_queue(), ^{
+		tweet[@"icon"] = [iconRaw imageToFitSize:NSMakeSize(48, 16.0) method:MGImageResizeCrop],
+		tweet[@"iconRaw"] =iconRaw,
+		[timelineTableView reloadData];
+	});
+}
+
+- (NSAttributedString *)autoLinkURLs:(NSString *)string {
+    NSMutableAttributedString *linkedString = [[NSMutableAttributedString alloc] initWithString:string];
+	
+	[linkedString addAttributes:@{
+				NSForegroundColorAttributeName: [NSColor controlTextColor],
+				NSFontAttributeName: [NSFont fontWithName:@"Osaka-Mono" size:12.0]
+			} range:NSMakeRange(0, [string length])];
+    NSDataDetector *detector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
+    [detector enumerateMatchesInString:string options:0 range:NSMakeRange(0, string.length) usingBlock:^(NSTextCheckingResult *match, NSMatchingFlags flags, BOOL *stop) {
+        if (match.URL) {
+            NSDictionary *attributes = @{
+				NSLinkAttributeName: match.URL,
+				NSForegroundColorAttributeName: [NSColor controlTextColor],
+				NSFontAttributeName: [NSFont fontWithName:@"Osaka-Mono" size:12.0]
+			};
+            [linkedString addAttributes:attributes range:match.range];
+        }
+    }];
+
+    return [linkedString copy];
+}
+
+- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row {
+	NSDictionary *selection = [[tweetsArrayController arrangedObjects] objectAtIndex:row];
+	if(selection)
+		[tweetDetailTweetTextVIew.textStorage setAttributedString:[self autoLinkURLs:selection[@"tweet"]]];
+
+	return YES;
 }
 
 @end
