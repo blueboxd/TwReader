@@ -10,22 +10,17 @@
 #import <Foundation/Foundation.h>
 #import "GDataOAuthWindowController.h"
 
+#import "TimelineViewController.h"
+
 @interface TwReader_AppDelegate : NSObject <NSTableViewDelegate>
 {
-    NSWindow *window;
-	GDataOAuthAuthentication *mAuth;
+ 	GDataOAuthAuthentication *mAuth;
 	NSString *sinceID;
 }
 
-@property (nonatomic, strong, retain) IBOutlet NSWindow *window;
+
 @property (nonatomic, strong, retain) IBOutlet NSArrayController *tweetsArrayController;
 @property (nonatomic, strong, retain) IBOutlet NSMutableArray *tweetsArray;
-@property (nonatomic, strong, retain) IBOutlet NSTableView *timelineTableView;
-
-@property (nonatomic, strong, retain) IBOutlet NSDrawer *tweetDetailDrawer;
-@property (nonatomic, strong, retain) IBOutlet NSView *tweetDetailDrawerView;
-@property (nonatomic, strong, retain) IBOutlet NSView *tweetDetailFooterView;
-
-@property (nonatomic, strong, retain) IBOutlet NSTextView *tweetDetailTweetTextVIew;
+@property (nonatomic, strong, retain) IBOutlet TimelineViewController *tvc;
 @end
 

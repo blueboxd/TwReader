@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		2F7446990DB6B7EA00F9684A /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2F7446970DB6B7EA00F9684A /* MainMenu.xib */; };
-		770B37ED0679A11B001EADE2 /* TwReader_DataModel.xcdatamodel in Sources */ = {isa = PBXBuildFile; fileRef = 770B37EC0679A11B001EADE2 /* TwReader_DataModel.xcdatamodel */; };
 		77C8280E06725ACE000B614F /* TwReader_AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 77C8280C06725ACE000B614F /* TwReader_AppDelegate.m */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
@@ -16,6 +15,11 @@
 		FBA1C970229620E300B7C0D8 /* NSImage+MGCropExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = FBA1C96F229620E300B7C0D8 /* NSImage+MGCropExtensions.m */; };
 		FBA8990522965C4400F36951 /* Tweet.m in Sources */ = {isa = PBXBuildFile; fileRef = FBA8990422965C4400F36951 /* Tweet.m */; };
 		FBA8A54C229941BE00F36951 /* FlippedView.m in Sources */ = {isa = PBXBuildFile; fileRef = FBA8A54B229941BE00F36951 /* FlippedView.m */; };
+		FBA8A60E2299490200F36951 /* TimelineViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBA8A60D2299490200F36951 /* TimelineViewController.m */; };
+		FBA8A6142299498100F36951 /* TimelineController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBA8A6132299498100F36951 /* TimelineController.m */; };
+		FBA8A6BD229950DD00F36951 /* ClickableImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = FBA8A6BC229950DD00F36951 /* ClickableImageView.m */; };
+		FBA8A9452299668400F36951 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBA8A9442299668400F36951 /* QTKit.framework */; };
+		FBA8AC9722998DA700F36951 /* PLVideoOverlayPlay.png in Resources */ = {isa = PBXBuildFile; fileRef = FBA8AC9622998DA700F36951 /* PLVideoOverlayPlay.png */; };
 		FBC80692228D195700E8D537 /* GDataOAuthAuthentication.m in Sources */ = {isa = PBXBuildFile; fileRef = FBC8068C228D195700E8D537 /* GDataOAuthAuthentication.m */; };
 		FBC80693228D195700E8D537 /* GDataOAuthSignIn.m in Sources */ = {isa = PBXBuildFile; fileRef = FBC8068E228D195700E8D537 /* GDataOAuthSignIn.m */; };
 		FBC80694228D195700E8D537 /* GDataOAuthWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = FBC8068F228D195700E8D537 /* GDataOAuthWindow.xib */; };
@@ -34,7 +38,6 @@
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		2F7446980DB6B7EA00F9684A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* TwReader_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TwReader_Prefix.pch; sourceTree = "<group>"; };
-		770B37EC0679A11B001EADE2 /* TwReader_DataModel.xcdatamodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcdatamodel; path = TwReader_DataModel.xcdatamodel; sourceTree = "<group>"; };
 		77C82804067257F0000B614F /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		77C8280B06725ACE000B614F /* TwReader_AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TwReader_AppDelegate.h; sourceTree = "<group>"; };
 		77C8280C06725ACE000B614F /* TwReader_AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TwReader_AppDelegate.m; sourceTree = "<group>"; };
@@ -46,6 +49,14 @@
 		FBA8990422965C4400F36951 /* Tweet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Tweet.m; sourceTree = "<group>"; };
 		FBA8A54A229941BE00F36951 /* FlippedView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlippedView.h; sourceTree = "<group>"; };
 		FBA8A54B229941BE00F36951 /* FlippedView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FlippedView.m; sourceTree = "<group>"; };
+		FBA8A60C2299490200F36951 /* TimelineViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimelineViewController.h; sourceTree = "<group>"; };
+		FBA8A60D2299490200F36951 /* TimelineViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimelineViewController.m; sourceTree = "<group>"; };
+		FBA8A6122299498100F36951 /* TimelineController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimelineController.h; sourceTree = "<group>"; };
+		FBA8A6132299498100F36951 /* TimelineController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimelineController.m; sourceTree = "<group>"; };
+		FBA8A6BB229950DD00F36951 /* ClickableImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClickableImageView.h; sourceTree = "<group>"; };
+		FBA8A6BC229950DD00F36951 /* ClickableImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClickableImageView.m; sourceTree = "<group>"; };
+		FBA8A9442299668400F36951 /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = System/Library/Frameworks/QTKit.framework; sourceTree = SDKROOT; };
+		FBA8AC9622998DA700F36951 /* PLVideoOverlayPlay.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PLVideoOverlayPlay.png; path = Resources/PLVideoOverlayPlay.png; sourceTree = "<group>"; };
 		FBC8068B228D195700E8D537 /* GDataOAuthAuthentication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataOAuthAuthentication.h; sourceTree = "<group>"; };
 		FBC8068C228D195700E8D537 /* GDataOAuthAuthentication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDataOAuthAuthentication.m; sourceTree = "<group>"; };
 		FBC8068D228D195700E8D537 /* GDataOAuthSignIn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataOAuthSignIn.h; sourceTree = "<group>"; };
@@ -69,6 +80,7 @@
 				FBC8071E228D22B900E8D537 /* SystemConfiguration.framework in Frameworks */,
 				FBC80720228D22C600E8D537 /* Security.framework in Frameworks */,
 				FBC80722228D22CF00E8D537 /* WebKit.framework in Frameworks */,
+				FBA8A9452299668400F36951 /* QTKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,12 +90,18 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				FBA8A6BB229950DD00F36951 /* ClickableImageView.h */,
+				FBA8A6BC229950DD00F36951 /* ClickableImageView.m */,
+				FBA8A6122299498100F36951 /* TimelineController.h */,
+				FBA8A6132299498100F36951 /* TimelineController.m */,
 				FBA8A54A229941BE00F36951 /* FlippedView.h */,
 				FBA8A54B229941BE00F36951 /* FlippedView.m */,
 				FBA1C96D229620E300B7C0D8 /* MGCropExtensions */,
 				FBC80728228D22F100E8D537 /* GData */,
 				77C8280B06725ACE000B614F /* TwReader_AppDelegate.h */,
 				77C8280C06725ACE000B614F /* TwReader_AppDelegate.m */,
+				FBA8A60C2299490200F36951 /* TimelineViewController.h */,
+				FBA8A60D2299490200F36951 /* TimelineViewController.m */,
 				FBA1CB1622963E8500B7C0D8 /* Tweet.h */,
 				FBA8990422965C4400F36951 /* Tweet.m */,
 			);
@@ -97,6 +115,7 @@
 				FBC8071D228D22B900E8D537 /* SystemConfiguration.framework */,
 				FBC8071F228D22C600E8D537 /* Security.framework */,
 				FBC80721228D22CF00E8D537 /* WebKit.framework */,
+				FBA8A9442299668400F36951 /* QTKit.framework */,
 			);
 			name = "Linked Frameworks";
 			sourceTree = "<group>";
@@ -122,7 +141,6 @@
 		29B97314FDCFA39411CA2CEA /* TwReader */ = {
 			isa = PBXGroup;
 			children = (
-				7756732906782D8800D1FEB8 /* Models */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
@@ -144,6 +162,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				FBA8AC9622998DA700F36951 /* PLVideoOverlayPlay.png */,
 				8D1107310486CEB800E47090 /* TwReader-Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 				2F7446970DB6B7EA00F9684A /* MainMenu.xib */,
@@ -158,14 +177,6 @@
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		7756732906782D8800D1FEB8 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				770B37EC0679A11B001EADE2 /* TwReader_DataModel.xcdatamodel */,
-			);
-			name = Models;
 			sourceTree = "<group>";
 		};
 		FBA1C96D229620E300B7C0D8 /* MGCropExtensions */ = {
@@ -264,6 +275,7 @@
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
 				2F7446990DB6B7EA00F9684A /* MainMenu.xib in Resources */,
 				FBC80694228D195700E8D537 /* GDataOAuthWindow.xib in Resources */,
+				FBA8AC9722998DA700F36951 /* PLVideoOverlayPlay.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -276,7 +288,6 @@
 			files = (
 				8D11072D0486CEB800E47090 /* main.m in Sources */,
 				77C8280E06725ACE000B614F /* TwReader_AppDelegate.m in Sources */,
-				770B37ED0679A11B001EADE2 /* TwReader_DataModel.xcdatamodel in Sources */,
 				FBC80692228D195700E8D537 /* GDataOAuthAuthentication.m in Sources */,
 				FBC80693228D195700E8D537 /* GDataOAuthSignIn.m in Sources */,
 				FBC80695228D195700E8D537 /* GDataOAuthWindowController.m in Sources */,
@@ -284,6 +295,9 @@
 				FBA1C970229620E300B7C0D8 /* NSImage+MGCropExtensions.m in Sources */,
 				FBA8990522965C4400F36951 /* Tweet.m in Sources */,
 				FBA8A54C229941BE00F36951 /* FlippedView.m in Sources */,
+				FBA8A60E2299490200F36951 /* TimelineViewController.m in Sources */,
+				FBA8A6142299498100F36951 /* TimelineController.m in Sources */,
+				FBA8A6BD229950DD00F36951 /* ClickableImageView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

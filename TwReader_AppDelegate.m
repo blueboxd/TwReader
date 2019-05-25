@@ -13,23 +13,12 @@
 
 @implementation TwReader_AppDelegate
 
-@synthesize window;
+
 @synthesize tweetsArrayController;
 @synthesize tweetsArray;
-@synthesize timelineTableView;
-@synthesize tweetDetailTweetTextVIew;
-@synthesize tweetDetailDrawer;
-@synthesize tweetDetailDrawerView;
-@synthesize tweetDetailFooterView;
-
+@synthesize tvc;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-	[tweetDetailDrawer openOnEdge:NSMaxXEdge];
-	[timelineTableView setSortDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"fullDate" ascending:NO]]];
-	[tweetDetailTweetTextVIew setVerticallyResizable:YES];
-//	tweetDetailTweetTextVIew.backgroundColor = [NSColor controlBackgroundColor];
-	tweetDetailTweetTextVIew.drawsBackground = NO;
-	tweetDetailTweetTextVIew.editable = NO;
 	
     // there is no saved Google authentication
     //
@@ -98,7 +87,7 @@ static NSString *const kTwitterAppServiceName = @"TwReader OAuth";
 														  authentication:auth
 														  appServiceName:kTwitterAppServiceName
 														  resourceBundle:nil];
-	[windowController signInSheetModalForWindow:window
+	[windowController signInSheetModalForWindow:nil
 									   delegate:self
 							   finishedSelector:@selector(windowController:finishedWithAuth:error:)];
 }
@@ -143,7 +132,7 @@ static NSString *const kTwitterAppServiceName = @"TwReader OAuth";
 	else
 		urlStr = @"https://api.twitter.com/1.1/lists/statuses.json?slug=tl-20180817180736&owner_screen_name=b5x&count=500&include_entities=true&include_rts=true&tweet_mode=extended";
 	
-	NSLog(@"fetch:%@",urlStr);
+//	NSLog(@"fetch:%@",urlStr);
 	NSURL *url = [NSURL URLWithString:urlStr];
 	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
 	[mAuth authorizeRequest:request];
@@ -157,16 +146,16 @@ static NSString *const kTwitterAppServiceName = @"TwReader OAuth";
 	if (data) {
 		NSError *err;
 		NSArray *tweets = [NSJSONSerialization JSONObjectWithData:data options:0 error:&err];
-		NSLog(@"%u tweets",(UInt32)[tweets count]);
+//		NSLog(@"%u tweets",(UInt32)[tweets count]);
 
 		[tweets enumerateObjectsUsingBlock:^(NSDictionary *tweet, NSUInteger idx, BOOL *stop) {
 			if(idx==0)
 				sinceID = tweet[@"id"];
 				
-			[tweetsArray addObject:[Tweet initWithTweetDictionary:tweet withDelegate:self]];
+			[tweetsArray addObject:[Tweet initWithTweetDictionary:tweet withDelegate:tvc]];
 			dispatch_async(dispatch_get_main_queue(), ^{
 				[tweetsArrayController rearrangeObjects];
-				[timelineTableView reloadData];
+//				[timelineTableView reloadData];
 			});
 		}];
 
@@ -179,13 +168,13 @@ static NSString *const kTwitterAppServiceName = @"TwReader OAuth";
 - (void)initialFetch {
 	NSString *urlStr;
 	__block NSString *maxID;
-	for(int i=0;i<1;i++) {
+	for(int i=0;i<5;i++) {
 		if(maxID)
 			urlStr = [NSString stringWithFormat:@"https://api.twitter.com/1.1/lists/statuses.json?slug=tl-20180817180736&owner_screen_name=b5x&count=500&include_entities=true&include_rts=true&tweet_mode=extended&max_id=%@",maxID];
 		else
 			urlStr = @"https://api.twitter.com/1.1/lists/statuses.json?slug=tl-20180817180736&owner_screen_name=b5x&count=500&include_entities=true&include_rts=true&tweet_mode=extended";
 
-		NSLog(@"fetch:%@",urlStr);
+//		NSLog(@"fetch:%@",urlStr);
 		NSURL *url = [NSURL URLWithString:urlStr];
 		NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
 		[mAuth authorizeRequest:request];
@@ -199,18 +188,19 @@ static NSString *const kTwitterAppServiceName = @"TwReader OAuth";
 		if (data) {
 			NSError *err;
 			NSArray *tweets = [NSJSONSerialization JSONObjectWithData:data options:0 error:&err];
-			NSLog(@"%u tweets",(UInt32)[tweets count]);
+//			NSLog(@"%u tweets",(UInt32)[tweets count]);
 
 			[tweets enumerateObjectsUsingBlock:^(NSDictionary *tweet, NSUInteger idx, BOOL *stop) {
 				if(i==0&&idx==0)
 					sinceID = tweet[@"id"];
 
 				maxID = tweet[@"id"];
-					
-				[tweetsArray addObject:[Tweet initWithTweetDictionary:tweet withDelegate:self]];
+				Tweet*tw = [Tweet initWithTweetDictionary:tweet withDelegate:tvc];
+//				if([tw hasMovie])
+					[tweetsArray addObject:tw];
 				dispatch_async(dispatch_get_main_queue(), ^{
 					[tweetsArrayController rearrangeObjects];
-					[timelineTableView reloadData];
+//					[timelineTableView reloadData];
 				});
 			}];
 
@@ -224,59 +214,6 @@ static NSString *const kTwitterAppServiceName = @"TwReader OAuth";
 	[[NSRunLoop mainRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
 }
 
-- (NSAttributedString *)autoLinkURLs:(NSString *)string {
-    NSMutableAttributedString *linkedString = [[NSMutableAttributedString alloc] initWithString:string];
-	
-	[linkedString addAttributes:@{
-				NSForegroundColorAttributeName: [NSColor controlTextColor],
-				NSFontAttributeName: [NSFont fontWithName:@"Osaka-Mono" size:12.0]
-			} range:NSMakeRange(0, [string length])];
-    NSDataDetector *detector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
-    [detector enumerateMatchesInString:string options:0 range:NSMakeRange(0, string.length) usingBlock:^(NSTextCheckingResult *match, NSMatchingFlags flags, BOOL *stop) {
-        if (match.URL) {
-            NSDictionary *attributes = @{
-				NSLinkAttributeName: match.URL,
-				NSForegroundColorAttributeName: [NSColor controlTextColor],
-				NSFontAttributeName: [NSFont fontWithName:@"Osaka-Mono" size:12.0]
-			};
-            [linkedString addAttributes:attributes range:match.range];
-        }
-    }];
 
-    return [linkedString copy];
-}
-
-- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row {
-	Tweet *selection = [[tweetsArrayController arrangedObjects] objectAtIndex:row];
-	if(selection) {
-		[tweetDetailTweetTextVIew.textStorage setAttributedString:[self autoLinkURLs:[selection fullTweet]]];
-		[[tweetDetailTweetTextVIew layoutManager] ensureLayoutForTextContainer:[tweetDetailTweetTextVIew textContainer]];
-		NSRect textRect = [tweetDetailTweetTextVIew frame];
-		NSRect footerRect = [tweetDetailFooterView frame];
-		footerRect.origin.y = textRect.origin.y-footerRect.size.height;
-		[tweetDetailFooterView setFrame:footerRect];
-//		tweetDetailDrawerView.position = nil;
-		[tweetDetailDrawerView setNeedsDisplay:YES];
-	}
-	return YES;
-}
-
--(void) finishedLoadIconAsync {
-
-	dispatch_async(dispatch_get_main_queue(), ^{
-
-		[timelineTableView reloadData];
-	});
-}
-
--(void) finishedLoadImageAsync {
-	dispatch_async(dispatch_get_main_queue(), ^{
-		[tweetsArrayController rearrangeObjects];
-//		[[tweetDetailImage1 image] recache];
-//		[tweetDetailImage1 drawCell:[tweetDetailImage1 cell]];
-//		[tweetDetailDrawerView setLayerContentsRedrawPolicy:NSViewLayerContentsRedrawOnSetNeedsDisplay];
-//		[tweetDetailDrawerView setNeedsDisplay:YES];
-	});
-}
 
 @end

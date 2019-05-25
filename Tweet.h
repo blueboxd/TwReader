@@ -8,7 +8,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-
 @interface Tweet : NSObject {
 	id delegate;
 	NSMutableDictionary *raw;
@@ -21,6 +20,7 @@
 	NSString *mFullTweet;
 	
 	NSImage *mImages[4];
+	QTMovie *mMovie;
 }
 
 + (Tweet*)initWithTweetDictionary:(NSDictionary*) dict;
@@ -33,4 +33,8 @@
 - (NSString*) date;
 - (NSImage*) icon;
 - (NSImage*) iconRaw;
+- (NSImage*) fullImage:(NSUInteger)idx;
+- (NSString*) fullImageSrc:(NSUInteger)idx;
+- (BOOL) hasMovie;
+- (void)loadMovieAsync;
 @end

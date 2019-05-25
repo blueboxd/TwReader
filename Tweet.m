@@ -167,7 +167,37 @@
 	return [mImages[3] imageToFitSize:NSMakeSize(256,256) method:MGImageResizeCrop];
 }
 
+- (NSImage*) fullImage:(NSUInteger)idx {
+	return mImages[idx];
+}
 
+- (NSString*) fullImageSrc:(NSUInteger)idx {
+	if([raw[@"extended_entities"][@"media"] count]>idx)
+	return [NSString stringWithFormat:@"%@:orig",raw[@"extended_entities"][@"media"][idx][@"media_url_https"]];
+}
+
+- (BOOL) hasMovie {
+	return raw[@"extended_entities"][@"media"][0][@"video_info"]!=nil;
+}
+
+- (NSDictionary*) finestMovieForMIME:(NSString*)mime {
+	if(![self hasMovie])
+		return nil;
+	
+	__block NSDictionary *candidate;
+	[raw[@"extended_entities"][@"media"][0][@"video_info"][@"variants"] enumerateObjectsUsingBlock:^(NSDictionary *media, NSUInteger idx, BOOL *stop) {
+		NSLog(@"%@",media);
+		if([mime isEqualToString:media[@"content_type"]]){
+			if(!candidate)
+				candidate = media;
+			else {
+				if(media[@"bitrate"]>candidate[@"bitrate"])
+					candidate = media;
+			}
+		}
+	}];
+	return candidate;
+}
 
 - (void) loadIconAsync {
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
@@ -207,7 +237,7 @@
 - (void) loadImageForIndex:(NSUInteger)idx {
 	NSError *error = nil;
 	NSURLResponse *response = nil;
-	NSString *url = raw[@"extended_entities"][@"media"][idx][@"media_url_https"];
+	NSString *url = [self fullImageSrc:idx];
 	NSData *data = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:10]
 										 returningResponse:&response
 													 error:&error];
@@ -225,5 +255,44 @@
 	if(delegate)
 		[delegate performSelector:@selector(finishedLoadImageAsync)];
 }
+
+- (void)loadMovieAsync {
+	if(![self hasMovie])
+		return;
+		
+	if(mMovie)
+		if(delegate)
+			[delegate performSelector:@selector(finishedLoadMovieAsync:) withObject:mMovie];
+		
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
+		[self loadMovieForURL:[self finestMovieForMIME:@"video/mp4"][@"url"]];
+	});
+}
+
+- (void) loadMovieForURL:(NSString*)url {
+	NSError *error = nil;
+	NSURLResponse *response = nil;
+	NSData *data = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:10]
+										 returningResponse:&response
+													 error:&error];
+
+	if(error) {
+		NSLog(@"%@",error);
+		return;
+	}
+	NSLog(@"loadMovieForURL:loaded:%@",url);
+	QTMovie *mov = [QTMovie movieWithData:data error:&error];
+
+	if(error) {
+		NSLog(@"%@",error);
+		return;
+	}
+
+	mMovie = mov;
+	
+	if(delegate)
+		[delegate performSelector:@selector(finishedLoadMovieAsync:) withObject:mMovie];
+}
+
 
 @end
