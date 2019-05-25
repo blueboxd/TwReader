@@ -10,6 +10,7 @@
 #import "NSImage+MGCropExtensions.h"
 #import "Tweet.h"
 
+
 @implementation TwReader_AppDelegate
 
 @synthesize window;
@@ -19,18 +20,17 @@
 @synthesize tweetDetailTweetTextVIew;
 @synthesize tweetDetailDrawer;
 @synthesize tweetDetailDrawerView;
-@synthesize tweetDetailImage1;
+@synthesize tweetDetailFooterView;
+
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
 	[tweetDetailDrawer openOnEdge:NSMaxXEdge];
 	[timelineTableView setSortDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"fullDate" ascending:NO]]];
 	[tweetDetailTweetTextVIew setVerticallyResizable:YES];
-	tweetDetailTweetTextVIew.backgroundColor = [NSColor controlBackgroundColor];
+//	tweetDetailTweetTextVIew.backgroundColor = [NSColor controlBackgroundColor];
 	tweetDetailTweetTextVIew.drawsBackground = NO;
+	tweetDetailTweetTextVIew.editable = NO;
 	
-	NSMethodSignature *sig = [timelineTableView methodSignatureForSelector:@selector(_changeSortDescriptorsForClickOnColumn:)];
-	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:sig];
-
     // there is no saved Google authentication
     //
     // perhaps we have a saved authorization for Twitter instead; try getting
@@ -48,9 +48,9 @@
     }
 	
 	if(mAuth) {
-		[self refreshTimeline];
-		NSTimer *timer = [NSTimer timerWithTimeInterval:5 target:self selector:@selector(refreshTimeline) userInfo:nil repeats:YES];
-		[[NSRunLoop mainRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
+		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+			[self initialFetch];
+		});
 	}
 }
 
@@ -143,7 +143,7 @@ static NSString *const kTwitterAppServiceName = @"TwReader OAuth";
 	else
 		urlStr = @"https://api.twitter.com/1.1/lists/statuses.json?slug=tl-20180817180736&owner_screen_name=b5x&count=500&include_entities=true&include_rts=true&tweet_mode=extended";
 	
-	NSLog(urlStr);
+	NSLog(@"fetch:%@",urlStr);
 	NSURL *url = [NSURL URLWithString:urlStr];
 	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
 	[mAuth authorizeRequest:request];
@@ -157,6 +157,7 @@ static NSString *const kTwitterAppServiceName = @"TwReader OAuth";
 	if (data) {
 		NSError *err;
 		NSArray *tweets = [NSJSONSerialization JSONObjectWithData:data options:0 error:&err];
+		NSLog(@"%u tweets",(UInt32)[tweets count]);
 
 		[tweets enumerateObjectsUsingBlock:^(NSDictionary *tweet, NSUInteger idx, BOOL *stop) {
 			if(idx==0)
@@ -175,6 +176,53 @@ static NSString *const kTwitterAppServiceName = @"TwReader OAuth";
 	}
 }
 
+- (void)initialFetch {
+	NSString *urlStr;
+	__block NSString *maxID;
+	for(int i=0;i<1;i++) {
+		if(maxID)
+			urlStr = [NSString stringWithFormat:@"https://api.twitter.com/1.1/lists/statuses.json?slug=tl-20180817180736&owner_screen_name=b5x&count=500&include_entities=true&include_rts=true&tweet_mode=extended&max_id=%@",maxID];
+		else
+			urlStr = @"https://api.twitter.com/1.1/lists/statuses.json?slug=tl-20180817180736&owner_screen_name=b5x&count=500&include_entities=true&include_rts=true&tweet_mode=extended";
+
+		NSLog(@"fetch:%@",urlStr);
+		NSURL *url = [NSURL URLWithString:urlStr];
+		NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+		[mAuth authorizeRequest:request];
+
+		NSError *error = nil;
+		NSURLResponse *response = nil;
+		NSData *data = [NSURLConnection sendSynchronousRequest:request
+											 returningResponse:&response
+														 error:&error];
+
+		if (data) {
+			NSError *err;
+			NSArray *tweets = [NSJSONSerialization JSONObjectWithData:data options:0 error:&err];
+			NSLog(@"%u tweets",(UInt32)[tweets count]);
+
+			[tweets enumerateObjectsUsingBlock:^(NSDictionary *tweet, NSUInteger idx, BOOL *stop) {
+				if(i==0&&idx==0)
+					sinceID = tweet[@"id"];
+
+				maxID = tweet[@"id"];
+					
+				[tweetsArray addObject:[Tweet initWithTweetDictionary:tweet withDelegate:self]];
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[tweetsArrayController rearrangeObjects];
+					[timelineTableView reloadData];
+				});
+			}];
+
+		} else {
+			// fetch failed
+			NSLog(@"API fetch error: %@", error);
+		}
+	}
+	
+	NSTimer *timer = [NSTimer timerWithTimeInterval:5 target:self selector:@selector(refreshTimeline) userInfo:nil repeats:YES];
+	[[NSRunLoop mainRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
+}
 
 - (NSAttributedString *)autoLinkURLs:(NSString *)string {
     NSMutableAttributedString *linkedString = [[NSMutableAttributedString alloc] initWithString:string];
@@ -202,6 +250,12 @@ static NSString *const kTwitterAppServiceName = @"TwReader OAuth";
 	Tweet *selection = [[tweetsArrayController arrangedObjects] objectAtIndex:row];
 	if(selection) {
 		[tweetDetailTweetTextVIew.textStorage setAttributedString:[self autoLinkURLs:[selection fullTweet]]];
+		[[tweetDetailTweetTextVIew layoutManager] ensureLayoutForTextContainer:[tweetDetailTweetTextVIew textContainer]];
+		NSRect textRect = [tweetDetailTweetTextVIew frame];
+		NSRect footerRect = [tweetDetailFooterView frame];
+		footerRect.origin.y = textRect.origin.y-footerRect.size.height;
+		[tweetDetailFooterView setFrame:footerRect];
+//		tweetDetailDrawerView.position = nil;
 		[tweetDetailDrawerView setNeedsDisplay:YES];
 	}
 	return YES;

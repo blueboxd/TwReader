@@ -24,7 +24,8 @@
 
 @property (nonatomic, strong, retain) IBOutlet NSDrawer *tweetDetailDrawer;
 @property (nonatomic, strong, retain) IBOutlet NSView *tweetDetailDrawerView;
-@property (nonatomic, strong, retain) IBOutlet NSImageView *tweetDetailImage1;
+@property (nonatomic, strong, retain) IBOutlet NSView *tweetDetailFooterView;
 
 @property (nonatomic, strong, retain) IBOutlet NSTextView *tweetDetailTweetTextVIew;
 @end
+

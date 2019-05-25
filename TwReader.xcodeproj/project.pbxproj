@@ -15,6 +15,7 @@
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		FBA1C970229620E300B7C0D8 /* NSImage+MGCropExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = FBA1C96F229620E300B7C0D8 /* NSImage+MGCropExtensions.m */; };
 		FBA8990522965C4400F36951 /* Tweet.m in Sources */ = {isa = PBXBuildFile; fileRef = FBA8990422965C4400F36951 /* Tweet.m */; };
+		FBA8A54C229941BE00F36951 /* FlippedView.m in Sources */ = {isa = PBXBuildFile; fileRef = FBA8A54B229941BE00F36951 /* FlippedView.m */; };
 		FBC80692228D195700E8D537 /* GDataOAuthAuthentication.m in Sources */ = {isa = PBXBuildFile; fileRef = FBC8068C228D195700E8D537 /* GDataOAuthAuthentication.m */; };
 		FBC80693228D195700E8D537 /* GDataOAuthSignIn.m in Sources */ = {isa = PBXBuildFile; fileRef = FBC8068E228D195700E8D537 /* GDataOAuthSignIn.m */; };
 		FBC80694228D195700E8D537 /* GDataOAuthWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = FBC8068F228D195700E8D537 /* GDataOAuthWindow.xib */; };
@@ -43,6 +44,8 @@
 		FBA1C96F229620E300B7C0D8 /* NSImage+MGCropExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSImage+MGCropExtensions.m"; sourceTree = "<group>"; };
 		FBA1CB1622963E8500B7C0D8 /* Tweet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tweet.h; sourceTree = "<group>"; };
 		FBA8990422965C4400F36951 /* Tweet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Tweet.m; sourceTree = "<group>"; };
+		FBA8A54A229941BE00F36951 /* FlippedView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlippedView.h; sourceTree = "<group>"; };
+		FBA8A54B229941BE00F36951 /* FlippedView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FlippedView.m; sourceTree = "<group>"; };
 		FBC8068B228D195700E8D537 /* GDataOAuthAuthentication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataOAuthAuthentication.h; sourceTree = "<group>"; };
 		FBC8068C228D195700E8D537 /* GDataOAuthAuthentication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDataOAuthAuthentication.m; sourceTree = "<group>"; };
 		FBC8068D228D195700E8D537 /* GDataOAuthSignIn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataOAuthSignIn.h; sourceTree = "<group>"; };
@@ -75,6 +78,8 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				FBA8A54A229941BE00F36951 /* FlippedView.h */,
+				FBA8A54B229941BE00F36951 /* FlippedView.m */,
 				FBA1C96D229620E300B7C0D8 /* MGCropExtensions */,
 				FBC80728228D22F100E8D537 /* GData */,
 				77C8280B06725ACE000B614F /* TwReader_AppDelegate.h */,
@@ -278,6 +283,7 @@
 				FBC806B7228D1AF500E8D537 /* GDataHTTPFetcher.m in Sources */,
 				FBA1C970229620E300B7C0D8 /* NSImage+MGCropExtensions.m in Sources */,
 				FBA8990522965C4400F36951 /* Tweet.m in Sources */,
+				FBA8A54C229941BE00F36951 /* FlippedView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -343,6 +349,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
