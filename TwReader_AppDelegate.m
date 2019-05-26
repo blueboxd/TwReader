@@ -196,8 +196,7 @@ static NSString *const kTwitterAppServiceName = @"TwReader OAuth";
 
 				maxID = tweet[@"id"];
 				Tweet*tw = [Tweet initWithTweetDictionary:tweet withDelegate:tvc];
-//				if([tw hasMovie])
-					[tweetsArray addObject:tw];
+				[tweetsArray addObject:tw];
 				dispatch_async(dispatch_get_main_queue(), ^{
 					[tweetsArrayController rearrangeObjects];
 //					[timelineTableView reloadData];

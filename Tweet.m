@@ -57,17 +57,23 @@
 	if (raw[@"retweeted_status"]) { 
 		fullText = [NSString stringWithFormat:@"RT @%@ %@",raw[@"retweeted_status"][@"user"][@"screen_name"],raw[@"retweeted_status"][@"full_text"]];
 		if(raw[@"retweeted_status"][@"entities"])
-			entities = raw[@"retweeted_status"][@"entities"];
+			mEntities = raw[@"retweeted_status"][@"entities"];
+		if(raw[@"retweeted_status"][@"extended_entities"])
+			mExtendedEntities = raw[@"retweeted_status"][@"extended_entities"];
+		
 	} else {
 		fullText = raw[@"full_text"];
 		if(raw[@"entities"])
-			entities = raw[@"entities"];
+			mEntities = raw[@"entities"];
+
+		if(raw[@"extended_entities"])
+			mExtendedEntities = raw[@"extended_entities"];
 	}
 	NSMutableString *tweet = [fullText mutableCopy];
 	NSMutableString *fullTweet = [fullText mutableCopy];
 
-	if(entities) {
-		[entities enumerateKeysAndObjectsUsingBlock:^(NSString*ekey, NSArray *curEntity, BOOL *stop) {
+	if(mEntities) {
+		[mEntities enumerateKeysAndObjectsUsingBlock:^(NSString*ekey, NSArray *curEntity, BOOL *stop) {
 //			NSLog(@"%@:%@",ekey,curEntity);
 			[curEntity enumerateObjectsUsingBlock:^(NSDictionary *url, NSUInteger idx, BOOL *stop) {
 //				NSLog(@"%u:%@",idx,url);
@@ -80,7 +86,25 @@
 	}
 	[tweet replaceOccurrencesOfString:@"\n" withString:@" " options:NSRegularExpressionSearch range:NSMakeRange(0, [tweet length])];
 	mTweet = tweet;
+
+    NSMutableAttributedString *linkedString = [[NSMutableAttributedString alloc] initWithString:fullTweet];
+	[linkedString addAttributes:@{
+				NSForegroundColorAttributeName: [NSColor controlTextColor],
+				NSFontAttributeName: [NSFont fontWithName:@"Osaka-Mono" size:12.0]
+			} range:NSMakeRange(0, [fullTweet length])];
+    NSDataDetector *detector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
+    [detector enumerateMatchesInString:fullTweet options:0 range:NSMakeRange(0, fullTweet.length) usingBlock:^(NSTextCheckingResult *match, NSMatchingFlags flags, BOOL *stop) {
+        if (match.URL) {
+            NSDictionary *attributes = @{
+				NSLinkAttributeName: match.URL,
+				NSForegroundColorAttributeName: [NSColor controlTextColor],
+				NSFontAttributeName: [NSFont fontWithName:@"Osaka-Mono" size:12.0]
+			};
+            [linkedString addAttributes:attributes range:match.range];
+        }
+    }];
 	mFullTweet = fullTweet;
+	mFullTweetAttributed = [linkedString copy];
 }
 
 - (void)setDelegate:(id) del {
@@ -95,34 +119,15 @@
 	return mFullTweet;
 }
 
+- (NSAttributedString*) fullTweetAttributed {
+	return mFullTweetAttributed;
+}
+
 - (NSString*) tweet {
 	return mTweet;
-
-	NSString *string = raw[@"full_text"];
-    NSMutableAttributedString *linkedString = [[NSMutableAttributedString alloc] initWithString:string];
-	
-	[linkedString addAttributes:@{
-				NSForegroundColorAttributeName: [NSColor controlTextColor],
-				NSFontAttributeName: [NSFont fontWithName:@"Osaka-Mono" size:12.0]
-			} range:NSMakeRange(0, [string length])];
-    NSDataDetector *detector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
-    [detector enumerateMatchesInString:string options:0 range:NSMakeRange(0, string.length) usingBlock:^(NSTextCheckingResult *match, NSMatchingFlags flags, BOOL *stop) {
-        if (match.URL) {
-            NSDictionary *attributes = @{
-				NSLinkAttributeName: match.URL,
-				NSForegroundColorAttributeName: [NSColor controlTextColor],
-				NSFontAttributeName: [NSFont fontWithName:@"Osaka-Mono" size:12.0]
-			};
-            [linkedString addAttributes:attributes range:match.range];
-        }
-    }];
-
-    return [linkedString copy];
-
 }
 
 - (NSString*) date {
-//	NSLog(@"%@:%@",self,raw[@"created_at"]);
 	return mDisplayDate;
 }
 
@@ -144,25 +149,25 @@
 
 - (NSImage*) image1 {
 //	NSLog(@"image1:%@",self);
-	if(!mImages[0] && raw[@"extended_entities"][@"media"])
+	if(!mImages[0] && mExtendedEntities[@"media"])
 		[self loadImageAsync:0];
 	return [mImages[0] imageToFitSize:NSMakeSize(256,256) method:MGImageResizeCrop];
 }
 
 - (NSImage*) image2 {
-	if(!mImages[1] && ([raw[@"extended_entities"][@"media"] count]>1))
+	if(!mImages[1] && ([mExtendedEntities[@"media"] count]>1))
 		[self loadImageAsync:1];
 	return [mImages[1] imageToFitSize:NSMakeSize(256,256) method:MGImageResizeCrop];
 }
 
 - (NSImage*) image3 {
-	if(!mImages[2] && ([raw[@"extended_entities"][@"media"] count]>2))
+	if(!mImages[2] && ([mExtendedEntities[@"media"] count]>2))
 		[self loadImageAsync:2];
 	return [mImages[2] imageToFitSize:NSMakeSize(256,256) method:MGImageResizeCrop];
 }
 
 - (NSImage*) image4 {
-	if(!mImages[3] && ([raw[@"extended_entities"][@"media"] count]>3))
+	if(!mImages[3] && ([mExtendedEntities[@"media"] count]>3))
 		[self loadImageAsync:3];
 	return [mImages[3] imageToFitSize:NSMakeSize(256,256) method:MGImageResizeCrop];
 }
@@ -172,12 +177,12 @@
 }
 
 - (NSString*) fullImageSrc:(NSUInteger)idx {
-	if([raw[@"extended_entities"][@"media"] count]>idx)
-	return [NSString stringWithFormat:@"%@:orig",raw[@"extended_entities"][@"media"][idx][@"media_url_https"]];
+	if([mExtendedEntities[@"media"] count]>idx)
+	return [NSString stringWithFormat:@"%@:orig",mExtendedEntities[@"media"][idx][@"media_url_https"]];
 }
 
 - (BOOL) hasMovie {
-	return raw[@"extended_entities"][@"media"][0][@"video_info"]!=nil;
+	return mExtendedEntities[@"media"][0][@"video_info"]!=nil;
 }
 
 - (NSDictionary*) finestMovieForMIME:(NSString*)mime {
@@ -185,13 +190,13 @@
 		return nil;
 	
 	__block NSDictionary *candidate;
-	[raw[@"extended_entities"][@"media"][0][@"video_info"][@"variants"] enumerateObjectsUsingBlock:^(NSDictionary *media, NSUInteger idx, BOOL *stop) {
+	[mExtendedEntities[@"media"][0][@"video_info"][@"variants"] enumerateObjectsUsingBlock:^(NSDictionary *media, NSUInteger idx, BOOL *stop) {
 		NSLog(@"%@",media);
 		if([mime isEqualToString:media[@"content_type"]]){
 			if(!candidate)
 				candidate = media;
 			else {
-				if(media[@"bitrate"]>candidate[@"bitrate"])
+				if([media[@"bitrate"] longValue]>[candidate[@"bitrate"] longValue])
 					candidate = media;
 			}
 		}
@@ -228,6 +233,9 @@
 }
 
 - (void) loadImageAsync:(NSUInteger)idx {
+	if(mImagesLoading[idx])
+		return;
+	mImagesLoading[idx] = YES;
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
 		[self loadImageForIndex:idx];
 	});
@@ -285,6 +293,10 @@
 
 	if(error) {
 		NSLog(@"%@",error);
+//		[[NSWorkspace sharedWorkspace] openURLs:@[[NSURL URLWithString:url]] withAppBundleIdentifier:@"com.google.Chrome" options:NSWorkspaceLaunchDefault additionalEventParamDescriptor:nil launchIdentifiers:nil];
+		NSMutableString *urlm = [url mutableCopy];
+		[urlm replaceOccurrencesOfString:@"https://" withString:@"http://" options:NSLiteralSearch range:NSMakeRange(0, [url length])];
+		[[NSWorkspace sharedWorkspace] openURLs:@[[NSURL URLWithString:urlm]] withAppBundleIdentifier:@"org.videolan.vlc" options:NSWorkspaceLaunchDefault additionalEventParamDescriptor:nil launchIdentifiers:nil];
 		return;
 	}
 

@@ -20,6 +20,8 @@
 		FBA8A6BD229950DD00F36951 /* ClickableImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = FBA8A6BC229950DD00F36951 /* ClickableImageView.m */; };
 		FBA8A9452299668400F36951 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBA8A9442299668400F36951 /* QTKit.framework */; };
 		FBA8AC9722998DA700F36951 /* PLVideoOverlayPlay.png in Resources */ = {isa = PBXBuildFile; fileRef = FBA8AC9622998DA700F36951 /* PLVideoOverlayPlay.png */; };
+		FBA8AEE6229A2AAF00F36951 /* round_stars_black_18dp.png in Resources */ = {isa = PBXBuildFile; fileRef = FBA8AEE4229A2AAF00F36951 /* round_stars_black_18dp.png */; };
+		FBA8AEE7229A2AAF00F36951 /* round_sync_black_18dp.png in Resources */ = {isa = PBXBuildFile; fileRef = FBA8AEE5229A2AAF00F36951 /* round_sync_black_18dp.png */; };
 		FBC80692228D195700E8D537 /* GDataOAuthAuthentication.m in Sources */ = {isa = PBXBuildFile; fileRef = FBC8068C228D195700E8D537 /* GDataOAuthAuthentication.m */; };
 		FBC80693228D195700E8D537 /* GDataOAuthSignIn.m in Sources */ = {isa = PBXBuildFile; fileRef = FBC8068E228D195700E8D537 /* GDataOAuthSignIn.m */; };
 		FBC80694228D195700E8D537 /* GDataOAuthWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = FBC8068F228D195700E8D537 /* GDataOAuthWindow.xib */; };
@@ -57,6 +59,8 @@
 		FBA8A6BC229950DD00F36951 /* ClickableImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClickableImageView.m; sourceTree = "<group>"; };
 		FBA8A9442299668400F36951 /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = System/Library/Frameworks/QTKit.framework; sourceTree = SDKROOT; };
 		FBA8AC9622998DA700F36951 /* PLVideoOverlayPlay.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PLVideoOverlayPlay.png; path = Resources/PLVideoOverlayPlay.png; sourceTree = "<group>"; };
+		FBA8AEE4229A2AAF00F36951 /* round_stars_black_18dp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = round_stars_black_18dp.png; path = Resources/round_stars_black_18dp.png; sourceTree = "<group>"; };
+		FBA8AEE5229A2AAF00F36951 /* round_sync_black_18dp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = round_sync_black_18dp.png; path = Resources/round_sync_black_18dp.png; sourceTree = "<group>"; };
 		FBC8068B228D195700E8D537 /* GDataOAuthAuthentication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataOAuthAuthentication.h; sourceTree = "<group>"; };
 		FBC8068C228D195700E8D537 /* GDataOAuthAuthentication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDataOAuthAuthentication.m; sourceTree = "<group>"; };
 		FBC8068D228D195700E8D537 /* GDataOAuthSignIn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataOAuthSignIn.h; sourceTree = "<group>"; };
@@ -162,6 +166,8 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				FBA8AEE4229A2AAF00F36951 /* round_stars_black_18dp.png */,
+				FBA8AEE5229A2AAF00F36951 /* round_sync_black_18dp.png */,
 				FBA8AC9622998DA700F36951 /* PLVideoOverlayPlay.png */,
 				8D1107310486CEB800E47090 /* TwReader-Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
@@ -276,6 +282,8 @@
 				2F7446990DB6B7EA00F9684A /* MainMenu.xib in Resources */,
 				FBC80694228D195700E8D537 /* GDataOAuthWindow.xib in Resources */,
 				FBA8AC9722998DA700F36951 /* PLVideoOverlayPlay.png in Resources */,
+				FBA8AEE6229A2AAF00F36951 /* round_stars_black_18dp.png in Resources */,
+				FBA8AEE7229A2AAF00F36951 /* round_sync_black_18dp.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

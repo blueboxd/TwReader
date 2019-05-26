@@ -11,6 +11,9 @@
 @interface Tweet : NSObject {
 	id delegate;
 	NSMutableDictionary *raw;
+	NSDictionary *mEntities;
+	NSDictionary *mExtendedEntities;
+	
 	NSImage	*mUserIcon;
 	NSImage	*mUserIconTrimmed;
 	NSString *mDisplayDate;
@@ -18,8 +21,10 @@
 	
 	NSString *mTweet;
 	NSString *mFullTweet;
+	NSAttributedString *mFullTweetAttributed;
 	
 	NSImage *mImages[4];
+	BOOL mImagesLoading[4];
 	QTMovie *mMovie;
 }
 
@@ -29,6 +34,7 @@
 - (void)setDelegate:(id) del;
 - (NSString*) user;
 - (NSString*) fullTweet;
+- (NSAttributedString*) fullTweetAttributed;
 - (NSString*) tweet;
 - (NSString*) date;
 - (NSImage*) icon;

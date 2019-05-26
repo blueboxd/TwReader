@@ -35,33 +35,10 @@
 	
 }
 
-
-- (NSAttributedString *)autoLinkURLs:(NSString *)string {
-    NSMutableAttributedString *linkedString = [[NSMutableAttributedString alloc] initWithString:string];
-	
-	[linkedString addAttributes:@{
-				NSForegroundColorAttributeName: [NSColor controlTextColor],
-				NSFontAttributeName: [NSFont fontWithName:@"Osaka-Mono" size:12.0]
-			} range:NSMakeRange(0, [string length])];
-    NSDataDetector *detector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
-    [detector enumerateMatchesInString:string options:0 range:NSMakeRange(0, string.length) usingBlock:^(NSTextCheckingResult *match, NSMatchingFlags flags, BOOL *stop) {
-        if (match.URL) {
-            NSDictionary *attributes = @{
-				NSLinkAttributeName: match.URL,
-				NSForegroundColorAttributeName: [NSColor controlTextColor],
-				NSFontAttributeName: [NSFont fontWithName:@"Osaka-Mono" size:12.0]
-			};
-            [linkedString addAttributes:attributes range:match.range];
-        }
-    }];
-
-    return [linkedString copy];
-}
-
 - (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row {
 	Tweet *selection = [[tweetsArrayController arrangedObjects] objectAtIndex:row];
 	if(selection) {
-		[tweetDetailTweetTextVIew.textStorage setAttributedString:[self autoLinkURLs:[selection fullTweet]]];
+		[tweetDetailTweetTextVIew.textStorage setAttributedString:[selection fullTweetAttributed]];
 		[[tweetDetailTweetTextVIew layoutManager] ensureLayoutForTextContainer:[tweetDetailTweetTextVIew textContainer]];
 		NSRect textRect = [tweetDetailTweetTextVIew frame];
 		NSRect footerRect = [tweetDetailFooterView frame];
@@ -84,10 +61,6 @@
 -(void) finishedLoadImageAsync {
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[tweetsArrayController rearrangeObjects];
-//		[[tweetDetailImage1 image] recache];
-//		[tweetDetailImage1 drawCell:[tweetDetailImage1 cell]];
-//		[tweetDetailDrawerView setLayerContentsRedrawPolicy:NSViewLayerContentsRedrawOnSetNeedsDisplay];
-//		[tweetDetailDrawerView setNeedsDisplay:YES];
 	});
 }
 
@@ -107,14 +80,17 @@
 - (void) finishedLoadMovieAsync:(QTMovie*)mov {
 //	[movieDetailWindow close];
 	[movieDetailView pause:self];
+	dispatch_async(dispatch_get_main_queue(), ^{
 	[movieDetailView setMovie:mov];
+	});
 	
 	NSValue* sizeVal = [mov attributeForKey:QTMovieNaturalSizeAttribute];
 	NSSize size = [sizeVal sizeValue];
-
+	dispatch_async(dispatch_get_main_queue(), ^{
 	[movieDetailWindow setFrame:[self sizeForContentAndCenteringForWindow:movieDetailWindow contentSize:size] display:YES animate:YES];
-
+	});
 	[movieDetailWindow makeKeyAndOrderFront:self];
+	[movieDetailView play:self];
 }
 
 - (IBAction) imageClicked:(NSControl*)sender {
@@ -141,9 +117,9 @@
 	NSSize size = [img size];
 	[pictureDetailView setImage:img];
 	[pictureDetailView setTag:sender.tag];
-
+	dispatch_async(dispatch_get_main_queue(), ^{
 	[pictureDetailWindow setFrame:[self sizeForContentAndCenteringForWindow:pictureDetailWindow contentSize:size] display:YES animate:YES];
-
+	});
 	[pictureDetailWindow makeKeyAndOrderFront:self];
 }
 
