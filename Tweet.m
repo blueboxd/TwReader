@@ -252,6 +252,7 @@
 
 	if(error) {
 		NSLog(@"%@",error);
+		mImagesLoading[idx] = NO;
 		return;
 	}
 	NSImage *image = [[NSImage alloc] initWithData:data];

@@ -153,6 +153,7 @@ static NSString *const kTwitterAppServiceName = @"TwReader OAuth";
 				sinceID = tweet[@"id"];
 				
 			[tweetsArray addObject:[Tweet initWithTweetDictionary:tweet withDelegate:tvc]];
+
 			dispatch_async(dispatch_get_main_queue(), ^{
 				[tweetsArrayController rearrangeObjects];
 //				[timelineTableView reloadData];
@@ -184,7 +185,12 @@ static NSString *const kTwitterAppServiceName = @"TwReader OAuth";
 		NSData *data = [NSURLConnection sendSynchronousRequest:request
 											 returningResponse:&response
 														 error:&error];
-
+		
+/*
+		NSMutableString *st=[NSMutableString stringWithContentsOfFile:@"/Users/bluebox/Projects/twitter/TLlog/20190527"];
+		[st replaceOccurrencesOfString:@"\n" withString:@"," options:NSLiteralSearch range:NSMakeRange(0, [st length])];
+		NSData *data2 = [[NSString stringWithFormat:@"[%@]",st] dataUsingEncoding:NSUTF8StringEncoding];
+*/
 		if (data) {
 			NSError *err;
 			NSArray *tweets = [NSJSONSerialization JSONObjectWithData:data options:0 error:&err];
@@ -197,12 +203,15 @@ static NSString *const kTwitterAppServiceName = @"TwReader OAuth";
 				maxID = tweet[@"id"];
 				Tweet*tw = [Tweet initWithTweetDictionary:tweet withDelegate:tvc];
 				[tweetsArray addObject:tw];
+				if(!(idx%100))
 				dispatch_async(dispatch_get_main_queue(), ^{
 					[tweetsArrayController rearrangeObjects];
 //					[timelineTableView reloadData];
 				});
 			}];
-
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[tweetsArrayController rearrangeObjects];
+			});
 		} else {
 			// fetch failed
 			NSLog(@"API fetch error: %@", error);

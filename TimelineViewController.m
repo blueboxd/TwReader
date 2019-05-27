@@ -11,7 +11,6 @@
 
 @implementation TimelineViewController
 
-
 @synthesize tweetsArrayController;
 @synthesize timelineWindow;
 @synthesize timelineTableView;
@@ -87,7 +86,7 @@
 	NSValue* sizeVal = [mov attributeForKey:QTMovieNaturalSizeAttribute];
 	NSSize size = [sizeVal sizeValue];
 	dispatch_async(dispatch_get_main_queue(), ^{
-	[movieDetailWindow setFrame:[self sizeForContentAndCenteringForWindow:movieDetailWindow contentSize:size] display:YES animate:YES];
+	[movieDetailWindow setFrame:[self sizeForContentAndCenteringForWindow:movieDetailWindow contentSize:size] display:NO animate:NO];
 	});
 	[movieDetailWindow makeKeyAndOrderFront:self];
 	[movieDetailView play:self];
@@ -118,7 +117,7 @@
 	[pictureDetailView setImage:img];
 	[pictureDetailView setTag:sender.tag];
 	dispatch_async(dispatch_get_main_queue(), ^{
-	[pictureDetailWindow setFrame:[self sizeForContentAndCenteringForWindow:pictureDetailWindow contentSize:size] display:YES animate:YES];
+	[pictureDetailWindow setFrame:[self sizeForContentAndCenteringForWindow:pictureDetailWindow contentSize:size] display:NO animate:NO];
 	});
 	[pictureDetailWindow makeKeyAndOrderFront:self];
 }
