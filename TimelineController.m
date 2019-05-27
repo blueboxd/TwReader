@@ -30,7 +30,7 @@
 	TimelineController *tc = [self new];
 	tc.filePath = [path path];
 	tc.windowTitle = [path lastPathComponent];
-//	[tc initialFetchForFile:path];
+
 	return tc;
 }
 
@@ -38,7 +38,13 @@
 {
 	self = [super init];
 	if (self) {
-		[NSBundle loadNibNamed:@"TimelineView" owner:self];
+		tweetsArray = [[NSMutableArray alloc] init];
+		NSNib *nib = [[NSNib alloc] initWithNibNamed:@"TimelineView" bundle:nil];
+		NSArray*ar;
+		if([nib instantiateNibWithOwner:self topLevelObjects:&ar]) {
+			topLevelObjects = ar;
+			[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(terminate) name:kTimeLineWindowClosed object:timelineViewController];
+		}
 	}
 	return self;
 }
@@ -53,6 +59,26 @@
 			[self initialFetchForFile:filePath];
 		});		
 	}
+}
+
+- (void)terminate {
+	NSLog(@"terminate:%@",self);
+	if(refreshTimer)
+		[refreshTimer invalidate];
+
+//	[topLevelObjects enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+//		CFRelease((__bridge CFTypeRef)obj);
+//	}];
+
+//	[tweetsArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+//		CFRelease((__bridge CFTypeRef)obj);
+//	}];
+	
+	[tweetsArrayController setContent:nil];
+	[tweetsArray removeAllObjects];
+	tweetsArrayController = nil;
+	tweetsArray =nil;
+	timelineViewController = nil;
 }
 
 - (void)startTimer {
@@ -127,11 +153,6 @@
 											 returningResponse:&response
 														 error:&error];
 		
-/*
-		NSMutableString *st=[NSMutableString stringWithContentsOfFile:@"/Users/bluebox/Projects/twitter/TLlog/20190527"];
-		[st replaceOccurrencesOfString:@"\n" withString:@"," options:NSLiteralSearch range:NSMakeRange(0, [st length])];
-		NSData *data2 = [[NSString stringWithFormat:@"[%@]",st] dataUsingEncoding:NSUTF8StringEncoding];
-*/
 		if (data) {
 			NSError *err;
 			NSArray *tweets = [NSJSONSerialization JSONObjectWithData:data options:0 error:&err];
@@ -143,7 +164,10 @@
 
 				maxID = tweet[@"id"];
 				Tweet*tw = [Tweet initWithTweetDictionary:tweet withDelegate:timelineViewController];
-				[tweetsArray addObject:tw];
+//				NSLog(@"Tweet*tw =%ld", CFGetRetainCount((__bridge CFTypeRef)tw));
+				if(tw)
+					[tweetsArray addObject:tw];
+//				NSLog(@"addObject: %ld", CFGetRetainCount((__bridge CFTypeRef)tw));
 				if(!(idx%100))
 				dispatch_async(dispatch_get_main_queue(), ^{
 					[tweetsArrayController rearrangeObjects];
@@ -176,7 +200,8 @@
 		[tweets enumerateObjectsUsingBlock:^(NSDictionary *tweet, NSUInteger idx, BOOL *stop) {
 
 			Tweet*tw = [Tweet initWithTweetDictionary:tweet withDelegate:timelineViewController];
-			[tweetsArray addObject:tw];
+			if(tw)
+				[tweetsArray addObject:tw];
 			if(!(idx%500))
 			dispatch_async(dispatch_get_main_queue(), ^{
 				[tweetsArrayController rearrangeObjects];

@@ -17,15 +17,16 @@
 @interface TimelineController : NSObject {
 	NSString *sinceID;
 	NSTimer *refreshTimer;
-	IBOutlet NSArrayController *tweetsArrayController;
+	IBOutlet __weak NSArrayController *tweetsArrayController;
 	IBOutlet TimelineViewController *timelineViewController;
+	NSArray *topLevelObjects;
 }
 
-@property (nonatomic, strong, retain) GDataOAuthAuthentication *mAuth;
-@property (nonatomic, strong, retain) NSString *windowTitle;
-@property (nonatomic, strong, retain) NSString *url;
-@property (nonatomic, strong, retain) NSString *filePath;
-@property (nonatomic, strong, retain) IBOutlet NSMutableArray *tweetsArray;
+@property (nonatomic) GDataOAuthAuthentication *mAuth;
+@property (nonatomic) NSString *windowTitle;
+@property (nonatomic) NSString *url;
+@property (nonatomic) NSString *filePath;
+@property (nonatomic) NSMutableArray *tweetsArray;
 @property (nonatomic) NSTimeInterval refreshTimerInterval;
 
 + initWithAuth:(GDataOAuthAuthentication*)auth forURL:(NSString*)url;

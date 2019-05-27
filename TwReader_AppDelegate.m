@@ -9,8 +9,9 @@
 #import "TwReader_AppDelegate.h"
 
 @implementation TwReader_AppDelegate
+typedef void (*HookFunc_Signature)(id, SEL); // << != IMP's signature
+static HookFunc_Signature gOriginalFunc = nil;
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-	
     // there is no saved Google authentication
     //
     // perhaps we have a saved authorization for Twitter instead; try getting
@@ -28,7 +29,7 @@
     }
 	
 	if(mAuth) {
-		TimelineController *tc = [TimelineController initWithAuth:mAuth forURL:@"https://api.twitter.com/1.1/lists/statuses.json?slug=tl-20180817180736&owner_screen_name=b5x&count=500&include_entities=true&include_rts=true&tweet_mode=extended"];
+		TimelineController *tc = [TimelineController initWithAuth:mAuth forURL:@"https://api.twitter.com/1.1/lists/statuses.json?slug=tl-20180817180736&owner_screen_name=b5x&count=200&include_entities=true&include_rts=true&tweet_mode=extended"];
 		tc.refreshTimerInterval = 5;
 		[tc start];
 	}
@@ -39,15 +40,15 @@
 	NSOpenPanel *panel = [NSOpenPanel openPanel];
 	[panel setCanChooseFiles:YES];
 	[panel setCanChooseDirectories:NO];
-	[panel setAllowsMultipleSelection:NO];
+	[panel setAllowsMultipleSelection:YES];
 	
 	[panel beginSheetModalForWindow:nil
 				  completionHandler:^(NSInteger result) {
 					  if (result == NSFileHandlingPanelOKButton) {
-						  NSURL* selectedURL = [[panel URLs] objectAtIndex:0];
-						  NSLog(@"selected URL: %@", [selectedURL path]);
-						  TimelineController *tc = [TimelineController initForFilePath:selectedURL];
-						  [tc start];
+						  [[panel URLs] enumerateObjectsUsingBlock:^(NSURL *url, NSUInteger idx, BOOL *stop) {
+							  TimelineController *tc = [TimelineController initForFilePath:url];
+							  [tc start];
+						  }];
 					  }
 				  }];
 }

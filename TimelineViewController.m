@@ -11,18 +11,18 @@
 
 @implementation TimelineViewController
 
-@synthesize tweetsArrayController;
-@synthesize timelineWindow;
-@synthesize timelineTableView;
-@synthesize tweetDetailTweetTextVIew;
-@synthesize tweetDetailDrawer;
-@synthesize tweetDetailDrawerView;
-@synthesize tweetDetailFooterView;
-@synthesize pictureDetailWindow;
-@synthesize pictureDetailView;
-
-@synthesize movieDetailWindow;
-@synthesize movieDetailView;
+//@synthesize tweetsArrayController;
+//@synthesize timelineWindow;
+//@synthesize timelineTableView;
+//@synthesize tweetDetailTweetTextVIew;
+//@synthesize tweetDetailDrawer;
+//@synthesize tweetDetailDrawerView;
+//@synthesize tweetDetailFooterView;
+//@synthesize pictureDetailWindow;
+//@synthesize pictureDetailView;
+//
+//@synthesize movieDetailWindow;
+//@synthesize movieDetailView;
 
 - (NSString *)windowNibName
 {
@@ -135,8 +135,13 @@
 	if(notification.object == movieDetailWindow)
 		[movieDetailView pause:self];
 
-	if(notification.object == timelineWindow)
-		[];
+	if(notification.object == timelineWindow) {
+//		timelineTableView = nil;
+//		tweetDetailDrawerView = nil;
+//		tweetDetailFooterView = nil;
+//		tweetsArrayController =nil;
+		[[NSNotificationCenter defaultCenter] postNotificationName:kTimeLineWindowClosed object:self];
+	}
 		
 }
 

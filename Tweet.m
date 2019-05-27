@@ -13,14 +13,18 @@
 
 + (Tweet*)initWithTweetDictionary:(NSDictionary*) dict {
 	Tweet* tw = [self new];
-	[tw setTweet:dict];
+	
+	if(![tw setTweet:dict])
+		return nil;
 
 	return tw;
 }
 
 + (Tweet*)initWithTweetDictionary:(NSDictionary*) dict withDelegate:(id)del {
 	Tweet* tw = [self new];
-	[tw setTweet:dict];
+	if(![tw setTweet:dict])
+		return nil;
+
 	[tw setDelegate:del];
 
 	return tw;
@@ -31,26 +35,35 @@
 	return self;
 }
 
-- (void)setTweet:(NSDictionary*) dict {
+- (instancetype) retain {
+	_objc_rootRetain(self);
+//	NSLog(@"retain:%@:%ul",self,CFGetRetainCount((__bridge CFTypeRef)self));
+//	NSLog(@"%@",[NSThread callStackSymbols]);
+	return self;
+}
+
+- (instancetype) release {
+	_objc_rootRelease(self);
+//	NSLog(@"release:%@:%ul",self,CFGetRetainCount((__bridge CFTypeRef)self));
+//	NSLog(@"%@",[NSThread callStackSymbols]);
+	return self;
+}
+
+- (void) dealloc{
+	NSLog(@"dealloc:%@",self);
+}
+
+- (BOOL)setTweet:(NSDictionary*) dict {
+	if(![dict isKindOfClass:[NSDictionary class]])
+		return NO;
+		
+	if(!dict[@"created_at"])
+		return NO;
+
 	raw = [dict mutableCopy];
 
-	NSDateFormatter *dateFormatterParser;
-	NSDateFormatter *dateFormatterFull;
-	NSDateFormatter *dateFormatterShort;
-
-	dateFormatterParser = [[NSDateFormatter alloc] init];
-	dateFormatterParser.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
-	dateFormatterParser.dateFormat = @"EEE MMM dd HH:mm:ss Z yyyy";
-	dateFormatterParser.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
-	dateFormatterFull = [[NSDateFormatter alloc] init];
-	dateFormatterFull.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
-	dateFormatterFull.dateFormat = @"yyyy/MM/dd HH:mm:ss";
-	dateFormatterShort = [[NSDateFormatter alloc] init];
-	dateFormatterShort.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
-	dateFormatterShort.dateFormat = @"HH:mm:ss";
-
-	mDisplayDate = [dateFormatterShort stringFromDate:[dateFormatterParser dateFromString:raw[@"created_at"]]];
-	mFullDate = [dateFormatterFull stringFromDate:[dateFormatterParser dateFromString:raw[@"created_at"]]];
+	mDisplayDate = [[TwitterDateTimeFormatter sharedInstance] shortDateForDate:raw[@"created_at"]];
+	mFullDate = [[TwitterDateTimeFormatter sharedInstance] longDateForDate:raw[@"created_at"]];
 	
 	NSString *fullText;
 	NSDictionary *entities=nil;
@@ -88,7 +101,7 @@
 	mTweet = tweet;
 
 	mFullTweet = fullTweet;
-	
+	return YES;
 }
 
 - (void)setDelegate:(id) del {
@@ -139,13 +152,13 @@
 }
 
 - (NSImage*) icon {
-	if(!mUserIconTrimmed)
+	if(!mUserIconTrimmed&&(!mIconLoading))
 		[self loadIconAsync];
 	return mUserIconTrimmed;
 }
 
 - (NSImage*) iconRaw {
-	if(!mUserIcon)
+	if(!mUserIcon&&(!mIconLoading))
 		[self loadIconAsync];
 	return mUserIcon;
 }
@@ -215,6 +228,7 @@
 }
 
 - (void) loadIconForURL:(NSString*)url {
+	mIconLoading=YES;
 	NSError *error = nil;
 	NSURLResponse *response = nil;
 	NSData *data = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:10]
@@ -223,6 +237,7 @@
 
 	if(error) {
 		NSLog(@"%@",error);
+		mIconLoading=NO;
 		return;
 	}
 	NSImage *iconRaw = [[NSImage alloc] initWithData:data];

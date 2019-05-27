@@ -9,27 +9,22 @@
 #import <Cocoa/Cocoa.h>
 #import <QTKit/QTKit.h>
 
-
+#define kTimeLineWindowClosed @"kTimeLineWindowClosed"
 @interface TimelineViewController : NSViewController {
+	IBOutlet __weak NSArrayController *tweetsArrayController;
+	IBOutlet  NSWindow *timelineWindow;
+	IBOutlet __weak NSTableView *timelineTableView;
+	IBOutlet __weak NSDrawer *tweetDetailDrawer;
+	IBOutlet __weak NSView *tweetDetailDrawerView;
+	IBOutlet __weak NSView *tweetDetailFooterView;
+	IBOutlet  NSTextView *tweetDetailTweetTextVIew;
+	IBOutlet  NSPanel *pictureDetailWindow;
+	IBOutlet __weak NSImageView *pictureDetailView;
+	IBOutlet  NSPanel *movieDetailWindow;
+	IBOutlet __weak QTMovieView *movieDetailView;
 
 }
 
-@property (nonatomic, strong, retain) IBOutlet NSArrayController *tweetsArrayController;
-@property (nonatomic, strong, retain) IBOutlet NSWindow *timelineWindow;
-
-@property (nonatomic, strong, retain) IBOutlet NSTableView *timelineTableView;
-
-@property (nonatomic, strong, retain) IBOutlet NSDrawer *tweetDetailDrawer;
-@property (nonatomic, strong, retain) IBOutlet NSView *tweetDetailDrawerView;
-@property (nonatomic, strong, retain) IBOutlet NSView *tweetDetailFooterView;
-
-@property (nonatomic, strong, retain) IBOutlet NSTextView *tweetDetailTweetTextVIew;
-
-@property (nonatomic, strong, retain) IBOutlet NSPanel *pictureDetailWindow;
-@property (nonatomic, strong, retain) IBOutlet NSImageView *pictureDetailView;
-
-@property (nonatomic, strong, retain) IBOutlet NSPanel *movieDetailWindow;
-@property (nonatomic, strong, retain) IBOutlet QTMovieView *movieDetailView;
 
 - (IBAction) imageClicked:(id)sender;
 

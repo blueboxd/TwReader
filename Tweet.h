@@ -7,6 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "TwitterDateTimeFormatter.h"
 
 @interface Tweet : NSObject {
 	id delegate;
@@ -14,6 +15,7 @@
 	NSDictionary *mEntities;
 	NSDictionary *mExtendedEntities;
 	
+	BOOL mIconLoading;
 	NSImage	*mUserIcon;
 	NSImage	*mUserIconTrimmed;
 	NSString *mDisplayDate;
@@ -30,7 +32,7 @@
 
 + (Tweet*)initWithTweetDictionary:(NSDictionary*) dict;
 + (Tweet*)initWithTweetDictionary:(NSDictionary*) dict withDelegate:(id)del;
-- (void)setTweet:(NSDictionary*) dict;
+- (BOOL)setTweet:(NSDictionary*) dict;
 - (void)setDelegate:(id) del;
 - (NSString*) user;
 - (NSString*) fullTweet;
