@@ -24,7 +24,15 @@
 @synthesize movieDetailWindow;
 @synthesize movieDetailView;
 
+- (NSString *)windowNibName
+{
+	// Override returning the nib file name of the document
+	// If you need to use a subclass of NSWindowController or if your document supports multiple NSWindowControllers, you should remove this method and override -makeWindowControllers instead.
+	return @"TimelineView";
+}
+
 - (void)awakeFromNib {
+	[timelineWindow makeKeyAndOrderFront:self];
 	[tweetDetailDrawer openOnEdge:NSMaxXEdge];
 	[timelineTableView setSortDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"fullDate" ascending:NO]]];
 	[tweetDetailTweetTextVIew setVerticallyResizable:YES];
@@ -126,8 +134,10 @@
 	NSLog(@"%@",notification);
 	if(notification.object == movieDetailWindow)
 		[movieDetailView pause:self];
-//	[movieDetailView setMovie:nil];
-//	return YES;
+
+	if(notification.object == timelineWindow)
+		[];
+		
 }
 
 @end

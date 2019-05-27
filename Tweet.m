@@ -87,24 +87,8 @@
 	[tweet replaceOccurrencesOfString:@"\n" withString:@" " options:NSRegularExpressionSearch range:NSMakeRange(0, [tweet length])];
 	mTweet = tweet;
 
-    NSMutableAttributedString *linkedString = [[NSMutableAttributedString alloc] initWithString:fullTweet];
-	[linkedString addAttributes:@{
-				NSForegroundColorAttributeName: [NSColor controlTextColor],
-				NSFontAttributeName: [NSFont fontWithName:@"Osaka-Mono" size:12.0]
-			} range:NSMakeRange(0, [fullTweet length])];
-    NSDataDetector *detector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
-    [detector enumerateMatchesInString:fullTweet options:0 range:NSMakeRange(0, fullTweet.length) usingBlock:^(NSTextCheckingResult *match, NSMatchingFlags flags, BOOL *stop) {
-        if (match.URL) {
-            NSDictionary *attributes = @{
-				NSLinkAttributeName: match.URL,
-				NSForegroundColorAttributeName: [NSColor controlTextColor],
-				NSFontAttributeName: [NSFont fontWithName:@"Osaka-Mono" size:12.0]
-			};
-            [linkedString addAttributes:attributes range:match.range];
-        }
-    }];
 	mFullTweet = fullTweet;
-	mFullTweetAttributed = [linkedString copy];
+	
 }
 
 - (void)setDelegate:(id) del {
@@ -120,6 +104,25 @@
 }
 
 - (NSAttributedString*) fullTweetAttributed {
+	if(!mFullTweetAttributed) {
+		NSMutableAttributedString *linkedString = [[NSMutableAttributedString alloc] initWithString:mFullTweet];
+		[linkedString addAttributes:@{
+					NSForegroundColorAttributeName: [NSColor controlTextColor],
+					NSFontAttributeName: [NSFont fontWithName:@"Osaka-Mono" size:12.0]
+				} range:NSMakeRange(0, [mFullTweet length])];
+		NSDataDetector *detector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
+		[detector enumerateMatchesInString:mFullTweet options:0 range:NSMakeRange(0, mFullTweet.length) usingBlock:^(NSTextCheckingResult *match, NSMatchingFlags flags, BOOL *stop) {
+			if (match.URL) {
+				NSDictionary *attributes = @{
+					NSLinkAttributeName: match.URL,
+					NSForegroundColorAttributeName: [NSColor controlTextColor],
+					NSFontAttributeName: [NSFont fontWithName:@"Osaka-Mono" size:12.0]
+				};
+				[linkedString addAttributes:attributes range:match.range];
+			}
+		}];
+		mFullTweetAttributed = [linkedString copy];
+	}
 	return mFullTweetAttributed;
 }
 

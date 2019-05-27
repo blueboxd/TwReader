@@ -10,17 +10,12 @@
 #import <Foundation/Foundation.h>
 #import "GDataOAuthWindowController.h"
 
-#import "TimelineViewController.h"
+#import "TimelineController.h"
 
-@interface TwReader_AppDelegate : NSObject <NSTableViewDelegate>
+@interface TwReader_AppDelegate : NSObject
 {
  	GDataOAuthAuthentication *mAuth;
-	NSString *sinceID;
 }
 
-
-@property (nonatomic, strong, retain) IBOutlet NSArrayController *tweetsArrayController;
-@property (nonatomic, strong, retain) IBOutlet NSMutableArray *tweetsArray;
-@property (nonatomic, strong, retain) IBOutlet TimelineViewController *tvc;
 @end
 

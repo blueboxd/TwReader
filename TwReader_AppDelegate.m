@@ -7,17 +7,8 @@
 //
 
 #import "TwReader_AppDelegate.h"
-#import "NSImage+MGCropExtensions.h"
-#import "Tweet.h"
-
 
 @implementation TwReader_AppDelegate
-
-
-@synthesize tweetsArrayController;
-@synthesize tweetsArray;
-@synthesize tvc;
-
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
 	
     // there is no saved Google authentication
@@ -37,10 +28,28 @@
     }
 	
 	if(mAuth) {
-		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-			[self initialFetch];
-		});
+		TimelineController *tc = [TimelineController initWithAuth:mAuth forURL:@"https://api.twitter.com/1.1/lists/statuses.json?slug=tl-20180817180736&owner_screen_name=b5x&count=500&include_entities=true&include_rts=true&tweet_mode=extended"];
+		tc.refreshTimerInterval = 5;
+		[tc start];
 	}
+}
+
+-(void)openDocument:(id)sender
+{
+	NSOpenPanel *panel = [NSOpenPanel openPanel];
+	[panel setCanChooseFiles:YES];
+	[panel setCanChooseDirectories:NO];
+	[panel setAllowsMultipleSelection:NO];
+	
+	[panel beginSheetModalForWindow:nil
+				  completionHandler:^(NSInteger result) {
+					  if (result == NSFileHandlingPanelOKButton) {
+						  NSURL* selectedURL = [[panel URLs] objectAtIndex:0];
+						  NSLog(@"selected URL: %@", [selectedURL path]);
+						  TimelineController *tc = [TimelineController initForFilePath:selectedURL];
+						  [tc start];
+					  }
+				  }];
 }
 
 static NSString *const kTwitterServiceName = @"Twitter";
@@ -92,9 +101,6 @@ static NSString *const kTwitterAppServiceName = @"TwReader OAuth";
 							   finishedSelector:@selector(windowController:finishedWithAuth:error:)];
 }
 
-
-
-
 - (void)windowController:(GDataOAuthWindowController *)windowController
         finishedWithAuth:(GDataOAuthAuthentication *)auth
                    error:(NSError *)error {
@@ -116,112 +122,5 @@ static NSString *const kTwitterAppServiceName = @"TwReader OAuth";
 		mAuth = auth;
 	}
 }
-
-#pragma mark -
-
-- (void)refreshTimeline{
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		[self doAnAuthenticatedAPIFetch];
-	});
-}
-
-- (void)doAnAuthenticatedAPIFetch {
-	NSString *urlStr;
-	if(sinceID)
-		urlStr = [NSString stringWithFormat:@"https://api.twitter.com/1.1/lists/statuses.json?slug=tl-20180817180736&owner_screen_name=b5x&count=500&include_entities=true&include_rts=true&tweet_mode=extended&since_id=%@",sinceID];//@"https://api.twitter.com/1.1/statuses/home_timeline.json?count=100&exclude_replies=false&include_entities=true&tweet_mode=extended";
-	else
-		urlStr = @"https://api.twitter.com/1.1/lists/statuses.json?slug=tl-20180817180736&owner_screen_name=b5x&count=500&include_entities=true&include_rts=true&tweet_mode=extended";
-	
-//	NSLog(@"fetch:%@",urlStr);
-	NSURL *url = [NSURL URLWithString:urlStr];
-	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-	[mAuth authorizeRequest:request];
-
-	NSError *error = nil;
-	NSURLResponse *response = nil;
-	NSData *data = [NSURLConnection sendSynchronousRequest:request
-										 returningResponse:&response
-													 error:&error];
-	
-	if (data) {
-		NSError *err;
-		NSArray *tweets = [NSJSONSerialization JSONObjectWithData:data options:0 error:&err];
-//		NSLog(@"%u tweets",(UInt32)[tweets count]);
-
-		[tweets enumerateObjectsUsingBlock:^(NSDictionary *tweet, NSUInteger idx, BOOL *stop) {
-			if(idx==0)
-				sinceID = tweet[@"id"];
-				
-			[tweetsArray addObject:[Tweet initWithTweetDictionary:tweet withDelegate:tvc]];
-
-			dispatch_async(dispatch_get_main_queue(), ^{
-				[tweetsArrayController rearrangeObjects];
-//				[timelineTableView reloadData];
-			});
-		}];
-
-	} else {
-		// fetch failed
-		NSLog(@"API fetch error: %@", error);
-	}
-}
-
-- (void)initialFetch {
-	NSString *urlStr;
-	__block NSString *maxID;
-	for(int i=0;i<5;i++) {
-		if(maxID)
-			urlStr = [NSString stringWithFormat:@"https://api.twitter.com/1.1/lists/statuses.json?slug=tl-20180817180736&owner_screen_name=b5x&count=500&include_entities=true&include_rts=true&tweet_mode=extended&max_id=%@",maxID];
-		else
-			urlStr = @"https://api.twitter.com/1.1/lists/statuses.json?slug=tl-20180817180736&owner_screen_name=b5x&count=500&include_entities=true&include_rts=true&tweet_mode=extended";
-
-//		NSLog(@"fetch:%@",urlStr);
-		NSURL *url = [NSURL URLWithString:urlStr];
-		NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-		[mAuth authorizeRequest:request];
-
-		NSError *error = nil;
-		NSURLResponse *response = nil;
-		NSData *data = [NSURLConnection sendSynchronousRequest:request
-											 returningResponse:&response
-														 error:&error];
-		
-/*
-		NSMutableString *st=[NSMutableString stringWithContentsOfFile:@"/Users/bluebox/Projects/twitter/TLlog/20190527"];
-		[st replaceOccurrencesOfString:@"\n" withString:@"," options:NSLiteralSearch range:NSMakeRange(0, [st length])];
-		NSData *data2 = [[NSString stringWithFormat:@"[%@]",st] dataUsingEncoding:NSUTF8StringEncoding];
-*/
-		if (data) {
-			NSError *err;
-			NSArray *tweets = [NSJSONSerialization JSONObjectWithData:data options:0 error:&err];
-//			NSLog(@"%u tweets",(UInt32)[tweets count]);
-
-			[tweets enumerateObjectsUsingBlock:^(NSDictionary *tweet, NSUInteger idx, BOOL *stop) {
-				if(i==0&&idx==0)
-					sinceID = tweet[@"id"];
-
-				maxID = tweet[@"id"];
-				Tweet*tw = [Tweet initWithTweetDictionary:tweet withDelegate:tvc];
-				[tweetsArray addObject:tw];
-				if(!(idx%100))
-				dispatch_async(dispatch_get_main_queue(), ^{
-					[tweetsArrayController rearrangeObjects];
-//					[timelineTableView reloadData];
-				});
-			}];
-			dispatch_async(dispatch_get_main_queue(), ^{
-				[tweetsArrayController rearrangeObjects];
-			});
-		} else {
-			// fetch failed
-			NSLog(@"API fetch error: %@", error);
-		}
-	}
-	
-	NSTimer *timer = [NSTimer timerWithTimeInterval:5 target:self selector:@selector(refreshTimeline) userInfo:nil repeats:YES];
-	[[NSRunLoop mainRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
-}
-
-
 
 @end

@@ -22,6 +22,7 @@
 		FBA8AC9722998DA700F36951 /* PLVideoOverlayPlay.png in Resources */ = {isa = PBXBuildFile; fileRef = FBA8AC9622998DA700F36951 /* PLVideoOverlayPlay.png */; };
 		FBA8AEE6229A2AAF00F36951 /* round_stars_black_18dp.png in Resources */ = {isa = PBXBuildFile; fileRef = FBA8AEE4229A2AAF00F36951 /* round_stars_black_18dp.png */; };
 		FBA8AEE7229A2AAF00F36951 /* round_sync_black_18dp.png in Resources */ = {isa = PBXBuildFile; fileRef = FBA8AEE5229A2AAF00F36951 /* round_sync_black_18dp.png */; };
+		FBA8B037229B9BBB00F36951 /* TimelineView.xib in Resources */ = {isa = PBXBuildFile; fileRef = FBA8B035229B9BBB00F36951 /* TimelineView.xib */; };
 		FBC80692228D195700E8D537 /* GDataOAuthAuthentication.m in Sources */ = {isa = PBXBuildFile; fileRef = FBC8068C228D195700E8D537 /* GDataOAuthAuthentication.m */; };
 		FBC80693228D195700E8D537 /* GDataOAuthSignIn.m in Sources */ = {isa = PBXBuildFile; fileRef = FBC8068E228D195700E8D537 /* GDataOAuthSignIn.m */; };
 		FBC80694228D195700E8D537 /* GDataOAuthWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = FBC8068F228D195700E8D537 /* GDataOAuthWindow.xib */; };
@@ -61,6 +62,7 @@
 		FBA8AC9622998DA700F36951 /* PLVideoOverlayPlay.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PLVideoOverlayPlay.png; path = Resources/PLVideoOverlayPlay.png; sourceTree = "<group>"; };
 		FBA8AEE4229A2AAF00F36951 /* round_stars_black_18dp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = round_stars_black_18dp.png; path = Resources/round_stars_black_18dp.png; sourceTree = "<group>"; };
 		FBA8AEE5229A2AAF00F36951 /* round_sync_black_18dp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = round_sync_black_18dp.png; path = Resources/round_sync_black_18dp.png; sourceTree = "<group>"; };
+		FBA8B036229B9BBB00F36951 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/TimelineView.xib; sourceTree = "<group>"; };
 		FBC8068B228D195700E8D537 /* GDataOAuthAuthentication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataOAuthAuthentication.h; sourceTree = "<group>"; };
 		FBC8068C228D195700E8D537 /* GDataOAuthAuthentication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDataOAuthAuthentication.m; sourceTree = "<group>"; };
 		FBC8068D228D195700E8D537 /* GDataOAuthSignIn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataOAuthSignIn.h; sourceTree = "<group>"; };
@@ -96,8 +98,6 @@
 			children = (
 				FBA8A6BB229950DD00F36951 /* ClickableImageView.h */,
 				FBA8A6BC229950DD00F36951 /* ClickableImageView.m */,
-				FBA8A6122299498100F36951 /* TimelineController.h */,
-				FBA8A6132299498100F36951 /* TimelineController.m */,
 				FBA8A54A229941BE00F36951 /* FlippedView.h */,
 				FBA8A54B229941BE00F36951 /* FlippedView.m */,
 				FBA1C96D229620E300B7C0D8 /* MGCropExtensions */,
@@ -106,6 +106,8 @@
 				77C8280C06725ACE000B614F /* TwReader_AppDelegate.m */,
 				FBA8A60C2299490200F36951 /* TimelineViewController.h */,
 				FBA8A60D2299490200F36951 /* TimelineViewController.m */,
+				FBA8A6122299498100F36951 /* TimelineController.h */,
+				FBA8A6132299498100F36951 /* TimelineController.m */,
 				FBA1CB1622963E8500B7C0D8 /* Tweet.h */,
 				FBA8990422965C4400F36951 /* Tweet.m */,
 			);
@@ -150,6 +152,7 @@
 				29B97317FDCFA39411CA2CEA /* Resources */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
+				FBA8B035229B9BBB00F36951 /* TimelineView.xib */,
 			);
 			name = TwReader;
 			sourceTree = "<group>";
@@ -284,6 +287,7 @@
 				FBA8AC9722998DA700F36951 /* PLVideoOverlayPlay.png in Resources */,
 				FBA8AEE6229A2AAF00F36951 /* round_stars_black_18dp.png in Resources */,
 				FBA8AEE7229A2AAF00F36951 /* round_sync_black_18dp.png in Resources */,
+				FBA8B037229B9BBB00F36951 /* TimelineView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -326,6 +330,14 @@
 				2F7446980DB6B7EA00F9684A /* English */,
 			);
 			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+		FBA8B035229B9BBB00F36951 /* TimelineView.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FBA8B036229B9BBB00F36951 /* English */,
+			);
+			name = TimelineView.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
