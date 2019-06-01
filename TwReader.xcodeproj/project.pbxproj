@@ -24,6 +24,7 @@
 		FBA8AEE7229A2AAF00F36951 /* round_sync_black_18dp.png in Resources */ = {isa = PBXBuildFile; fileRef = FBA8AEE5229A2AAF00F36951 /* round_sync_black_18dp.png */; };
 		FBA8B037229B9BBB00F36951 /* TimelineView.xib in Resources */ = {isa = PBXBuildFile; fileRef = FBA8B035229B9BBB00F36951 /* TimelineView.xib */; };
 		FBA8B5EA229BCC3100F36951 /* TwitterDateTimeFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = FBA8B5E9229BCC3100F36951 /* TwitterDateTimeFormatter.m */; };
+		FBA8C005229D4F6800F36951 /* CachedAsyncURLConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = FBA8C004229D4F6800F36951 /* CachedAsyncURLConnection.m */; };
 		FBC80692228D195700E8D537 /* GDataOAuthAuthentication.m in Sources */ = {isa = PBXBuildFile; fileRef = FBC8068C228D195700E8D537 /* GDataOAuthAuthentication.m */; };
 		FBC80693228D195700E8D537 /* GDataOAuthSignIn.m in Sources */ = {isa = PBXBuildFile; fileRef = FBC8068E228D195700E8D537 /* GDataOAuthSignIn.m */; };
 		FBC80694228D195700E8D537 /* GDataOAuthWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = FBC8068F228D195700E8D537 /* GDataOAuthWindow.xib */; };
@@ -66,6 +67,8 @@
 		FBA8B036229B9BBB00F36951 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/TimelineView.xib; sourceTree = "<group>"; };
 		FBA8B5E8229BCC3100F36951 /* TwitterDateTimeFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TwitterDateTimeFormatter.h; sourceTree = "<group>"; };
 		FBA8B5E9229BCC3100F36951 /* TwitterDateTimeFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TwitterDateTimeFormatter.m; sourceTree = "<group>"; };
+		FBA8C003229D4F6800F36951 /* CachedAsyncURLConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CachedAsyncURLConnection.h; sourceTree = "<group>"; };
+		FBA8C004229D4F6800F36951 /* CachedAsyncURLConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CachedAsyncURLConnection.m; sourceTree = "<group>"; };
 		FBC8068B228D195700E8D537 /* GDataOAuthAuthentication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataOAuthAuthentication.h; sourceTree = "<group>"; };
 		FBC8068C228D195700E8D537 /* GDataOAuthAuthentication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDataOAuthAuthentication.m; sourceTree = "<group>"; };
 		FBC8068D228D195700E8D537 /* GDataOAuthSignIn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataOAuthSignIn.h; sourceTree = "<group>"; };
@@ -99,6 +102,8 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				FBA8C003229D4F6800F36951 /* CachedAsyncURLConnection.h */,
+				FBA8C004229D4F6800F36951 /* CachedAsyncURLConnection.m */,
 				FBA8B5E8229BCC3100F36951 /* TwitterDateTimeFormatter.h */,
 				FBA8B5E9229BCC3100F36951 /* TwitterDateTimeFormatter.m */,
 				FBA8A6BB229950DD00F36951 /* ClickableImageView.h */,
@@ -157,7 +162,6 @@
 				29B97317FDCFA39411CA2CEA /* Resources */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
-				FBA8B035229B9BBB00F36951 /* TimelineView.xib */,
 			);
 			name = TwReader;
 			sourceTree = "<group>";
@@ -174,6 +178,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				FBA8B035229B9BBB00F36951 /* TimelineView.xib */,
 				FBA8AEE4229A2AAF00F36951 /* round_stars_black_18dp.png */,
 				FBA8AEE5229A2AAF00F36951 /* round_sync_black_18dp.png */,
 				FBA8AC9622998DA700F36951 /* PLVideoOverlayPlay.png */,
@@ -316,6 +321,7 @@
 				FBA8A6142299498100F36951 /* TimelineController.m in Sources */,
 				FBA8A6BD229950DD00F36951 /* ClickableImageView.m in Sources */,
 				FBA8B5EA229BCC3100F36951 /* TwitterDateTimeFormatter.m in Sources */,
+				FBA8C005229D4F6800F36951 /* CachedAsyncURLConnection.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -388,6 +394,15 @@
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_EXPLICIT_OWNERSHIP_TYPE = YES;
+				CLANG_WARN_OBJC_IMPLICIT_ATOMIC_PROPERTIES = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = NO;
+				CLANG_WARN_OBJC_INTERFACE_IVARS = NO;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_MISSING_PROPERTY_SYNTHESIS = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
@@ -395,8 +410,10 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
-				RUN_CLANG_STATIC_ANALYZER = YES;
+				RUN_CLANG_STATIC_ANALYZER = NO;
 				SDKROOT = macosx10.7;
 				VALID_ARCHS = x86_64;
 			};
@@ -408,6 +425,15 @@
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_EXPLICIT_OWNERSHIP_TYPE = YES;
+				CLANG_WARN_OBJC_IMPLICIT_ATOMIC_PROPERTIES = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_INTERFACE_IVARS = NO;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_MISSING_PROPERTY_SYNTHESIS = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvm.clang9.9_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;

@@ -26,31 +26,36 @@
 		return nil;
 
 	[tw setDelegate:del];
-
+//	NSLog(@"init:%@(%@):%ul",tw,[tw user],CFGetRetainCount((__bridge CFTypeRef)self));
 	return tw;
 }
 
 - (Tweet*) init{
 	self = [super init];
+
 	return self;
 }
 
+#if 0
 - (instancetype) retain {
 	_objc_rootRetain(self);
-//	NSLog(@"retain:%@:%ul",self,CFGetRetainCount((__bridge CFTypeRef)self));
+//	NSLog(@"retain:%@(%@):%ul",self,[self user],CFGetRetainCount((__bridge CFTypeRef)self));
 //	NSLog(@"%@",[NSThread callStackSymbols]);
 	return self;
 }
 
 - (instancetype) release {
 	_objc_rootRelease(self);
-//	NSLog(@"release:%@:%ul",self,CFGetRetainCount((__bridge CFTypeRef)self));
+//	NSLog(@"release:%@(%@):%ul",self,[self user],CFGetRetainCount((__bridge CFTypeRef)self));
 //	NSLog(@"%@",[NSThread callStackSymbols]);
 	return self;
 }
+#endif
 
 - (void) dealloc{
-	NSLog(@"dealloc:%@",self);
+//	NSLog(@"dealloc:%@(%@):%ul",self,[self user],CFGetRetainCount((__bridge CFTypeRef)self));
+//	NSLog(@"%@",[NSThread callStackSymbols]);
+	mRewteetedStatus = nil;
 }
 
 - (BOOL)setTweet:(NSDictionary*) dict {
@@ -64,16 +69,31 @@
 
 	mDisplayDate = [[TwitterDateTimeFormatter sharedInstance] shortDateForDate:raw[@"created_at"]];
 	mFullDate = [[TwitterDateTimeFormatter sharedInstance] longDateForDate:raw[@"created_at"]];
-	
+
+if(0)
+{
+	NSError *err;
+	NSRegularExpression *regexp = [NSRegularExpression regularExpressionWithPattern:@"<a href=\"([^\"]+)[^>]+>([^<]+)" options:0 error:&err];
+	NSArray *matches = [regexp matchesInString:raw[@"source"] options:0 range:NSMakeRange(0, [raw[@"source"] length])];
+	NSRange r = [matches[0] rangeAtIndex:2];
+	NSLog(@"res %@", [raw[@"source"] substringWithRange:r]);
+}
+
 	NSString *fullText;
-	NSDictionary *entities=nil;
-	if (raw[@"retweeted_status"]) { 
+	mIsRetweet = NO;
+	if (raw[@"retweeted_status"]) {
+		mRewteetedStatus = [Tweet initWithTweetDictionary:raw[@"retweeted_status"] withDelegate:self];
+//		NSLog(@"%@",mRewteetedStatus);
 		fullText = [NSString stringWithFormat:@"RT @%@ %@",raw[@"retweeted_status"][@"user"][@"screen_name"],raw[@"retweeted_status"][@"full_text"]];
 		if(raw[@"retweeted_status"][@"entities"])
 			mEntities = raw[@"retweeted_status"][@"entities"];
 		if(raw[@"retweeted_status"][@"extended_entities"])
 			mExtendedEntities = raw[@"retweeted_status"][@"extended_entities"];
-		
+		mIsRetweet = YES;
+		mUserInfo = raw[@"retweeted_status"][@"user"];
+		mOriginalUserInfo = raw[@"user"];
+		mStatus = raw[@"retweeted_status"];
+		mOriginalStatus = raw;
 	} else {
 		fullText = raw[@"full_text"];
 		if(raw[@"entities"])
@@ -81,6 +101,8 @@
 
 		if(raw[@"extended_entities"])
 			mExtendedEntities = raw[@"extended_entities"];
+		mUserInfo = mOriginalUserInfo = raw[@"user"];
+		mStatus = mOriginalStatus = raw;
 	}
 	NSMutableString *tweet = [fullText mutableCopy];
 	NSMutableString *fullTweet = [fullText mutableCopy];
@@ -110,6 +132,18 @@
 
 - (NSString*) user {
 	return raw[@"user"][@"screen_name"];
+}
+
+- (NSString*) statusID {
+	return raw[@"id_str"];
+}
+
+- (NSString*) mentionedStatusID {
+	return raw[@"in_reply_to_status_id_str"];
+}
+
+- (NSString*) mentionedUser {
+	return raw[@"in_reply_to_screen_name"];
 }
 
 - (NSString*) fullTweet {
@@ -143,6 +177,10 @@
 	return mTweet;
 }
 
+- (BOOL) isRetweet {
+	return mIsRetweet;
+}
+
 - (NSString*) date {
 	return mDisplayDate;
 }
@@ -153,13 +191,13 @@
 
 - (NSImage*) icon {
 	if(!mUserIconTrimmed&&(!mIconLoading))
-		[self loadIconAsync];
+		[self loadIconAsync:mOriginalUserInfo[@"profile_image_url_https"]];
 	return mUserIconTrimmed;
 }
 
 - (NSImage*) iconRaw {
 	if(!mUserIcon&&(!mIconLoading))
-		[self loadIconAsync];
+		[self loadIconAsync:mUserInfo[@"profile_image_url_https"]];
 	return mUserIcon;
 }
 
@@ -220,9 +258,9 @@
 	return candidate;
 }
 
-- (void) loadIconAsync {
+- (void) loadIconAsync:(NSString*)url {
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
-		[self loadIconForURL:raw[@"user"][@"profile_image_url_https"]];
+		[self loadIconForURL:url];
 	});
 
 }
@@ -312,10 +350,10 @@
 
 	if(error) {
 		NSLog(@"%@",error);
-//		[[NSWorkspace sharedWorkspace] openURLs:@[[NSURL URLWithString:url]] withAppBundleIdentifier:@"com.google.Chrome" options:NSWorkspaceLaunchDefault additionalEventParamDescriptor:nil launchIdentifiers:nil];
-		NSMutableString *urlm = [url mutableCopy];
-		[urlm replaceOccurrencesOfString:@"https://" withString:@"http://" options:NSLiteralSearch range:NSMakeRange(0, [url length])];
-		[[NSWorkspace sharedWorkspace] openURLs:@[[NSURL URLWithString:urlm]] withAppBundleIdentifier:@"org.videolan.vlc" options:NSWorkspaceLaunchDefault additionalEventParamDescriptor:nil launchIdentifiers:nil];
+		[[NSWorkspace sharedWorkspace] openURLs:@[[NSURL URLWithString:url]] withAppBundleIdentifier:@"com.google.Chrome" options:NSWorkspaceLaunchDefault additionalEventParamDescriptor:nil launchIdentifiers:nil];
+//		NSMutableString *urlm = [url mutableCopy];
+//		[urlm replaceOccurrencesOfString:@"https://" withString:@"http://" options:NSLiteralSearch range:NSMakeRange(0, [url length])];
+//		[[NSWorkspace sharedWorkspace] openURLs:@[[NSURL URLWithString:urlm]] withAppBundleIdentifier:@"org.videolan.vlc" options:NSWorkspaceLaunchDefault additionalEventParamDescriptor:nil launchIdentifiers:nil];
 		return;
 	}
 

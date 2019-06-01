@@ -154,25 +154,30 @@
 														 error:&error];
 		
 		if (data) {
+			dispatch_queue_t arrayQ = dispatch_queue_create([urlStr cStringUsingEncoding:NSASCIIStringEncoding], DISPATCH_QUEUE_SERIAL);
 			NSError *err;
 			NSArray *tweets = [NSJSONSerialization JSONObjectWithData:data options:0 error:&err];
 //			NSLog(@"%u tweets",(UInt32)[tweets count]);
 
-			[tweets enumerateObjectsUsingBlock:^(NSDictionary *tweet, NSUInteger idx, BOOL *stop) {
+//			[tweets enumerateObjectsUsingBlock:^(NSDictionary *tweet, NSUInteger idx, BOOL *stop) {
+			[tweets enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(NSDictionary *tweet, NSUInteger idx, BOOL *stop) {
 				if(i==0&&idx==0)
 					sinceID = tweet[@"id"];
-
-				maxID = tweet[@"id"];
+				
 				Tweet*tw = [Tweet initWithTweetDictionary:tweet withDelegate:timelineViewController];
-//				NSLog(@"Tweet*tw =%ld", CFGetRetainCount((__bridge CFTypeRef)tw));
-				if(tw)
-					[tweetsArray addObject:tw];
-//				NSLog(@"addObject: %ld", CFGetRetainCount((__bridge CFTypeRef)tw));
+				if(tw) {
+					dispatch_async(arrayQ, ^{
+						[tweetsArray addObject:tw];
+					});
+				}
 				if(!(idx%100))
 				dispatch_async(dispatch_get_main_queue(), ^{
 					[tweetsArrayController rearrangeObjects];
-//					[timelineTableView reloadData];
 				});
+				
+				if ((idx+1)==[tweets count]) {
+					maxID = tweet[@"id"];
+				}
 			}];
 			dispatch_async(dispatch_get_main_queue(), ^{
 				[tweetsArrayController rearrangeObjects];
@@ -191,17 +196,20 @@
 	NSMutableString *st=[NSMutableString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:&err];
 	[st replaceOccurrencesOfString:@"\n" withString:@"," options:NSLiteralSearch range:NSMakeRange(0, [st length])];
 	NSData *data = [[NSString stringWithFormat:@"[%@]",st] dataUsingEncoding:NSUTF8StringEncoding];
-
+	
 	if (data) {
-		
+		dispatch_queue_t arrayQ = dispatch_queue_create([path cStringUsingEncoding:NSASCIIStringEncoding], DISPATCH_QUEUE_SERIAL);	
 		NSArray *tweets = [NSJSONSerialization JSONObjectWithData:data options:0 error:&err];
 		NSLog(@"%u tweets",(UInt32)[tweets count]);
 
-		[tweets enumerateObjectsUsingBlock:^(NSDictionary *tweet, NSUInteger idx, BOOL *stop) {
-
+		[tweets enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(NSDictionary *tweet, NSUInteger idx, BOOL *stop) {
+//		[tweets enumerateObjectsUsingBlock:^(NSDictionary *tweet, NSUInteger idx, BOOL *stop) {
 			Tweet*tw = [Tweet initWithTweetDictionary:tweet withDelegate:timelineViewController];
-			if(tw)
+			if(tw) {
+				dispatch_async(arrayQ, ^{
 				[tweetsArray addObject:tw];
+				});
+			}
 			if(!(idx%500))
 			dispatch_async(dispatch_get_main_queue(), ^{
 				[tweetsArrayController rearrangeObjects];

@@ -10,7 +10,7 @@
 #import <QTKit/QTKit.h>
 
 #define kTimeLineWindowClosed @"kTimeLineWindowClosed"
-@interface TimelineViewController : NSViewController {
+@interface TimelineViewController : NSObject {
 	IBOutlet __weak NSArrayController *tweetsArrayController;
 	IBOutlet  NSWindow *timelineWindow;
 	IBOutlet __weak NSTableView *timelineTableView;

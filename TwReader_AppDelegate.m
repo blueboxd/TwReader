@@ -9,8 +9,7 @@
 #import "TwReader_AppDelegate.h"
 
 @implementation TwReader_AppDelegate
-typedef void (*HookFunc_Signature)(id, SEL); // << != IMP's signature
-static HookFunc_Signature gOriginalFunc = nil;
+
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // there is no saved Google authentication
     //

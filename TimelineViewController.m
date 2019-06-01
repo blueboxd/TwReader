@@ -57,6 +57,15 @@
 	return YES;
 }
 
+- (NSSize)drawerWillResizeContents:(NSDrawer *)sender toSize:(NSSize)contentSize {
+	NSRect textRect = [tweetDetailTweetTextVIew frame];
+	NSRect footerRect = [tweetDetailFooterView frame];
+	footerRect.origin.y = textRect.origin.y-footerRect.size.height;
+	[tweetDetailFooterView setFrame:footerRect];
+
+	return contentSize;
+}
+
 -(void) finishedLoadIconAsync {
 
 	dispatch_async(dispatch_get_main_queue(), ^{
@@ -66,8 +75,14 @@
 }
 
 -(void) finishedLoadImageAsync {
+	[self reselectCurrentSelection];
+}
+
+-(void) reselectCurrentSelection {
 	dispatch_async(dispatch_get_main_queue(), ^{
-		[tweetsArrayController rearrangeObjects];
+		NSIndexSet *index = [tweetsArrayController selectionIndexes];
+		[tweetsArrayController setSelectionIndexes:[NSIndexSet indexSet]];
+		[tweetsArrayController setSelectionIndexes:index];
 	});
 }
 
@@ -131,7 +146,7 @@
 }
 
 - (void)windowWillClose:(NSNotification *)notification {
-	NSLog(@"%@",notification);
+//	NSLog(@"%@",notification);
 	if(notification.object == movieDetailWindow)
 		[movieDetailView pause:self];
 
@@ -142,7 +157,56 @@
 //		tweetsArrayController =nil;
 		[[NSNotificationCenter defaultCenter] postNotificationName:kTimeLineWindowClosed object:self];
 	}
+
+}
+
+- (void)tableView:(NSTableView *)tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
+	if(![NSThread isMainThread])
+		NSLog(@"%@",[NSThread currentThread]);
+//	dispatch_async(dispatch_get_main_queue(), ^{
+		if([[tweetsArrayController selectedObjects] count]==0)return;
+		if(![cell isKindOfClass:[NSTextFieldCell class]])return;
 		
+		Tweet *selected = [tweetsArrayController selectedObjects][0];
+		Tweet *current = [tweetsArrayController arrangedObjects][row];
+	//	NSLog(@"%u:%@/%@",row,[selected user],[current user]);
+	//	NSLog(@"%u:%@/%@",row,[selected mentionedStatusID],[current statusID]);
+		if ([[selected user] isEqualToString:[current user]]) {
+			[cell setBackgroundColor:[NSColor colorWithDeviceRed:0.9 green:0.9 blue:0.9 alpha:1]];
+		} else if (
+			(([selected mentionedStatusID]!=[NSNull null]) && ([current mentionedStatusID]!=[NSNull null]))
+			&& ([[current statusID] isEqualToString:[selected mentionedStatusID]] || [[selected statusID] isEqualToString:[current mentionedStatusID]])) {
+			[cell setBackgroundColor:[NSColor colorWithDeviceRed:0.95 green:0.85 blue:0.85 alpha:1]];
+		} else if (
+			([selected mentionedUser]!=[NSNull null]) &&
+			([[current user] isEqualToString:[selected mentionedUser]]))
+			{
+			[cell setBackgroundColor:[NSColor colorWithDeviceRed:0.85 green:0.95 blue:0.85 alpha:1]];
+		} else {
+			[cell setBackgroundColor:[NSColor controlBackgroundColor]];
+		}
+//	});
+
+}
+
+- (CGFloat)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row {
+//	NSLog(@"%u",row);
+	if([[tweetsArrayController selectionIndexes] firstIndex]==row)
+		return 48.0f;
+	else {
+		return 16.0f;
+	}
+}
+
+- (void)tableViewSelectionDidChange:(NSNotification *)notification {
+//	NSLog(@"tableViewSelectionDidChange:%@",notification);
+//	[timelineTableView reloadDataForRowIndexes:[tweetsArrayController selectionIndexes] columnIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 3)]];
+//    NSTableColumn *column = [timelineTableView tableColumnWithIdentifier:@"tweet"];
+//    NSCell *cell = [column dataCellForRow:[[notification object] selectedRow]];
+//	cell.wraps = YES;
+//	NSLog(@"%@",cell);
+
+	[timelineTableView reloadData];
 }
 
 @end

@@ -17,7 +17,7 @@
 @interface TimelineController : NSObject {
 	NSString *sinceID;
 	NSTimer *refreshTimer;
-	IBOutlet __weak NSArrayController *tweetsArrayController;
+	IBOutlet NSArrayController *tweetsArrayController;
 	IBOutlet TimelineViewController *timelineViewController;
 	NSArray *topLevelObjects;
 }

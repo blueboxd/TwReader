@@ -24,7 +24,7 @@
 - (TwitterDateTimeFormatter*)init{
 	self = [super init];
 	
-	formatterQueue = dispatch_queue_create("TwitterDateTimeFormatter queue", NULL);
+	formatterQueue = dispatch_queue_create("TwitterDateTimeFormatter queue", DISPATCH_QUEUE_SERIAL);
 	dateFormatterParser = [[NSDateFormatter alloc] init];
 	dateFormatterParser.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
 	dateFormatterParser.dateFormat = @"EEE MMM dd HH:mm:ss Z yyyy";
